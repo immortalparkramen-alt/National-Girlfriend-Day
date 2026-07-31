@@ -1,0 +1,5639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Closing the Distance</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Love+Light&family=Love+Ya+Like+A+Sister&display=swap');
+    :root {
+      --pink: #ff78b4;
+      --deep-pink: #d92f7b;
+      --cream: #fff5fb;
+      --dark: #100916;
+      --panel: rgba(19, 9, 27, 0.78);
+      --hud-text: #ffe8f4;
+      --key-bg: rgba(93, 25, 69, .82);
+      --key-text: #ffd9eb;
+      --key-active: rgba(219, 69, 139, .70);
+      --progress-a: #ff6cae;
+      --progress-b: #ffd2e7;
+      --track-bg: rgba(255,255,255,.12);
+      --track-border: rgba(255,255,255,.13);
+      --ending-overlay: rgba(0,0,0,.38);
+      --ending-card-bg: rgba(20, 8, 28, .88);
+      --ending-glow: rgba(255, 101, 174, .24);
+      --ending-title: #fff5fb;
+      --ending-copy: #ead2df;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      color: var(--cream);
+      font-family: "Love Ya Like A Sister", cursive;
+      touch-action: manipulation;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    #startScreen {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(255, 95, 170, .16), transparent 34%),
+        #000;
+      z-index: 10;
+      text-align: center;
+      transition: opacity .7s ease;
+    }
+
+    #startScreen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .start-card {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: auto;
+      padding: 44px 54px 48px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      isolation: isolate;
+    }
+
+    .start-card::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      width: 260px;
+      height: 160px;
+      border-radius: 50%;
+      background:
+        radial-gradient(
+          circle,
+          rgba(205, 83, 145, .22) 0%,
+          rgba(142, 47, 104, .11) 42%,
+          transparent 72%
+        );
+      filter: blur(10px);
+      animation: beginGlow 2.8s ease-in-out infinite;
+    }
+
+    .start-card::after {
+      content: "✦  ·  ♡  ·  ✦";
+      position: absolute;
+      bottom: 13px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 172, 210, .72);
+      font-family: "Love Ya Like A Sister", cursive;
+      font-size: .9rem;
+      letter-spacing: .16em;
+      white-space: nowrap;
+      text-shadow: 0 0 12px rgba(255, 103, 174, .30);
+      animation: beginTwinkle 2.4s ease-in-out infinite;
+    }
+
+    .tiny {
+      margin: 0 0 10px;
+      color: #ff9fc9;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0 0 clamp(22px, 5vw, 32px);
+      font-family: "Love Light", cursive;
+      font-size: clamp(2.4rem, 8vw, 4.85rem);
+      font-weight: 400;
+      line-height: .98;
+      letter-spacing: .008em;
+      word-spacing: .045em;
+      white-space: nowrap;
+    }
+
+    .start-card p {
+      margin: 0 auto;
+      max-width: 430px;
+      color: #d9bfd0;
+      line-height: 1.65;
+    }
+
+    #startButton {
+      position: relative;
+      min-width: 154px;
+      border: 1px solid rgba(255, 216, 233, .34);
+      border-radius: 999px;
+      padding: 14px 31px;
+      color: #fff1f7;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(142, 55, 102, .98),
+          rgba(87, 31, 70, .98)
+        );
+      font-family: "Love Ya Like A Sister", cursive;
+      font-size: clamp(1.15rem, 3.4vw, 1.35rem);
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: .045em;
+      cursor: pointer;
+      box-shadow:
+        0 13px 30px rgba(45, 10, 35, .44),
+        0 0 24px rgba(211, 85, 145, .17),
+        inset 0 1px 0 rgba(255,255,255,.20),
+        inset 0 -7px 16px rgba(52, 12, 41, .17);
+      text-shadow: 0 1px 4px rgba(39, 7, 30, .34);
+      animation: beginFloat 2.8s ease-in-out infinite;
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        filter .18s ease;
+    }
+
+    #startButton::before,
+    #startButton::after {
+      position: absolute;
+      top: 50%;
+      color: rgba(255, 173, 211, .84);
+      font-family: "Love Ya Like A Sister", cursive;
+      font-size: 1rem;
+      text-shadow: 0 0 10px rgba(255, 104, 175, .38);
+      pointer-events: none;
+    }
+
+    #startButton::before {
+      content: "♡";
+      left: -29px;
+      transform: translateY(-50%) rotate(-10deg);
+    }
+
+    #startButton::after {
+      content: "♡";
+      right: -29px;
+      transform: translateY(-50%) rotate(10deg);
+    }
+
+    #startButton:hover {
+      transform: translateY(-3px) scale(1.035);
+      filter: brightness(1.08);
+      box-shadow:
+        0 17px 38px rgba(45, 10, 35, .50),
+        0 0 31px rgba(224, 104, 159, .24),
+        inset 0 1px 0 rgba(255,255,255,.24),
+        inset 0 -7px 16px rgba(52, 12, 41, .14);
+    }
+
+    #startButton:focus-visible {
+      outline: 3px solid rgba(255, 188, 218, .58);
+      outline-offset: 6px;
+    }
+
+    #startButton:active {
+      transform: translateY(0) scale(.97);
+      filter: brightness(.96);
+    }
+
+    @keyframes beginFloat {
+      50% {
+        translate: 0 -3px;
+      }
+    }
+
+    @keyframes beginGlow {
+      50% {
+        transform: scale(1.08);
+        opacity: .82;
+      }
+    }
+
+    @keyframes beginTwinkle {
+      50% {
+        opacity: .48;
+        letter-spacing: .20em;
+      }
+    }
+
+    #hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    #message {
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      width: max-content;
+      min-width: min(240px, calc(100% - 32px));
+      max-width: min(520px, calc(100% - 32px));
+      transform: translateX(-50%);
+      padding: 11px 15px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 16px;
+      background: var(--panel);
+      text-align: center;
+      color: var(--hud-text);
+      opacity: 0;
+      transition: opacity .25s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    #message.show { opacity: 1; }
+
+    #progressWrap {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: min(220px, 34vw);
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--track-bg);
+      border: 1px solid var(--track-border);
+    }
+
+    #progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--progress-a), var(--progress-b));
+      transition: width .35s ease;
+    }
+
+    #controls {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      display: none;
+      gap: 10px;
+      z-index: 5;
+      pointer-events: auto;
+    }
+
+    #controls.show { display: flex; }
+
+    .key {
+      width: 58px;
+      height: 58px;
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 17px;
+      color: var(--key-text);
+      background: var(--key-bg);
+      font-family: "Love Ya Like A Sister", cursive;
+      font-size: 26px;
+      font-weight: 400;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      transition: transform .12s ease, background .12s ease;
+    }
+
+    .key:active {
+      transform: scale(.92);
+      background: var(--key-active);
+    }
+
+    .key.correct-glow {
+      animation: correctKeyGlow .58s cubic-bezier(.16,.84,.28,1);
+    }
+
+    .key.incorrect-glow {
+      animation: incorrectKeyGlow .62s cubic-bezier(.22,.74,.30,1);
+    }
+
+    @keyframes correctKeyGlow {
+      0% {
+        transform: scale(1);
+        filter: brightness(1);
+        box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      }
+      34% {
+        transform: translateY(-3px) scale(1.10);
+        color: #fff;
+        background: rgba(255, 124, 181, .94);
+        filter: brightness(1.17);
+        box-shadow:
+          0 0 0 3px rgba(255, 209, 229, .15),
+          0 0 19px rgba(255, 101, 170, .72),
+          0 11px 25px rgba(76, 20, 57, .35);
+      }
+      68% {
+        transform: translateY(-1px) scale(1.045);
+        color: #fff;
+        background: rgba(238, 104, 163, .88);
+        box-shadow:
+          0 0 0 6px rgba(255, 209, 229, 0),
+          0 0 13px rgba(255, 126, 183, .46),
+          0 9px 22px rgba(76, 20, 57, .30);
+      }
+      100% {
+        transform: scale(1);
+        filter: brightness(1);
+        box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      }
+    }
+
+    @keyframes incorrectKeyGlow {
+      0% {
+        transform: translateX(0) scale(1);
+        filter: brightness(1);
+        box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      }
+      18% {
+        transform: translateX(-5px) scale(1.04);
+      }
+      34% {
+        transform: translateX(5px) scale(1.07);
+        color: #fff6f6;
+        background: rgba(180, 45, 68, .96);
+        filter: brightness(1.10);
+        box-shadow:
+          0 0 0 3px rgba(255, 158, 167, .16),
+          0 0 19px rgba(255, 65, 91, .70),
+          0 10px 25px rgba(66, 10, 25, .38);
+      }
+      50% {
+        transform: translateX(-4px) scale(1.05);
+      }
+      66% {
+        transform: translateX(3px) scale(1.025);
+        color: #fff6f6;
+        background: rgba(147, 39, 61, .92);
+        box-shadow:
+          0 0 0 7px rgba(255, 132, 145, 0),
+          0 0 13px rgba(255, 76, 97, .46),
+          0 9px 22px rgba(66, 10, 25, .32);
+      }
+      82% {
+        transform: translateX(-1px) scale(1.01);
+      }
+      100% {
+        transform: translateX(0) scale(1);
+        filter: brightness(1);
+        box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      }
+    }
+
+
+    #cinematicNote {
+      position: fixed;
+      inset: 0;
+      z-index: 7;
+      display: grid;
+      place-items: center;
+      padding: clamp(22px, 5vw, 58px);
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 50% 48%,
+          rgba(111, 40, 82, .24),
+          transparent 48%
+        ),
+        rgba(9, 3, 12, .74);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        opacity .58s ease,
+        visibility 0s linear .58s;
+    }
+
+    #cinematicNote::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(0, 0, 0, .44),
+          transparent 24%,
+          transparent 76%,
+          rgba(0, 0, 0, .52)
+        );
+      pointer-events: none;
+    }
+
+    #cinematicNote.show {
+      opacity: 1;
+      visibility: visible;
+      transition:
+        opacity .58s ease,
+        visibility 0s linear 0s;
+    }
+
+    .cinematic-frame {
+      position: relative;
+      width: min(850px, 100%);
+      min-height: clamp(230px, 38vh, 330px);
+      display: grid;
+      align-content: center;
+      padding:
+        clamp(38px, 7vw, 68px)
+        clamp(24px, 7vw, 72px);
+      border-top: 1px solid rgba(255, 212, 231, .33);
+      border-bottom: 1px solid rgba(255, 212, 231, .33);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(16px) scale(.985);
+      transition:
+        opacity .64s ease .12s,
+        transform .82s cubic-bezier(.16,.82,.24,1) .08s;
+    }
+
+    #cinematicNote.show .cinematic-frame {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .cinematic-frame::before,
+    .cinematic-frame::after {
+      content: "✦";
+      position: absolute;
+      top: 50%;
+      translate: 0 -50%;
+      color: rgba(255, 173, 210, .65);
+      font-family: Georgia, serif;
+      font-size: .82rem;
+      text-shadow: 0 0 15px rgba(255, 101, 169, .48);
+    }
+
+    .cinematic-frame::before { left: 4px; }
+    .cinematic-frame::after { right: 4px; }
+
+    #cinematicPlatform {
+      margin-bottom: 18px;
+      color: rgba(255, 184, 215, .78);
+      font-family: "Love Ya Like A Sister", cursive;
+      font-size: clamp(.72rem, 1.8vw, .88rem);
+      font-weight: 400;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    #cinematicText {
+      width: min(680px, 100%);
+      max-width: 680px;
+      min-height: 5.6em;
+      margin: 0 auto;
+      color: #fff4f9;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      text-align: left;
+      text-wrap: wrap;
+      font-family: "Love Ya Like A Sister", cursive;
+      font-size: clamp(1.12rem, 2.8vw, 1.62rem);
+      font-weight: 400;
+      line-height: 1.68;
+      letter-spacing: .01em;
+      text-shadow:
+        0 2px 18px rgba(0, 0, 0, .72),
+        0 0 22px rgba(255, 129, 184, .10);
+    }
+
+    .cinematic-char {
+      display: inline;
+      opacity: 0;
+      filter: blur(1.8px);
+      animation:
+        cinematicCharacterIn
+        .20s
+        cubic-bezier(.18,.78,.28,1)
+        forwards;
+    }
+
+    #cinematicText.typing::after {
+      content: "";
+      display: inline-block;
+      width: 2px;
+      height: 1.08em;
+      margin-left: 5px;
+      vertical-align: -.12em;
+      background: rgba(255, 199, 224, .92);
+      box-shadow: 0 0 9px rgba(255, 124, 182, .62);
+      animation: cinematicCursor .82s steps(1) infinite;
+    }
+
+    .cinematic-heart {
+      margin-top: 20px;
+      color: rgba(255, 157, 201, .82);
+      font-family: Georgia, serif;
+      font-size: 1.05rem;
+      letter-spacing: .22em;
+      opacity: .86;
+    }
+
+    body.cinematic-active #hud {
+      opacity: 0;
+    }
+
+    #hud {
+      transition: opacity .32s ease;
+    }
+
+    @keyframes cinematicCharacterIn {
+      0% {
+        opacity: 0;
+        filter: blur(1.8px);
+        text-shadow: 0 0 9px rgba(255, 175, 213, .20);
+      }
+      55% {
+        opacity: .72;
+        filter: blur(.5px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0);
+        text-shadow: inherit;
+      }
+    }
+
+    @keyframes cinematicCursor {
+      50% { opacity: 0; }
+    }
+
+    #ending {
+      position: fixed;
+      inset: 0;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      background: var(--ending-overlay);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      backdrop-filter: blur(0);
+      transition:
+        opacity 1.45s ease,
+        backdrop-filter 1.65s ease,
+        visibility 0s linear 1.65s;
+    }
+
+    #ending.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      backdrop-filter: blur(7px);
+      transition:
+        opacity 1.45s ease,
+        backdrop-filter 1.65s ease,
+        visibility 0s linear 0s;
+    }
+
+    .ending-card {
+      position: relative;
+      width: min(700px, 100%);
+      padding: 42px 30px 36px;
+      overflow: hidden;
+      border-radius: 34px;
+      border: 1px solid rgba(255,255,255,.24);
+      background:
+        radial-gradient(circle at 50% -10%, var(--ending-glow), transparent 53%),
+        var(--ending-card-bg);
+      box-shadow:
+        0 24px 90px rgba(255, 74, 151, .25),
+        inset 0 1px 0 rgba(255,255,255,.22);
+      opacity: 0;
+      transform: translateY(24px) scale(.965);
+      filter: blur(8px);
+      transition:
+        opacity 1.4s ease .20s,
+        transform 1.75s cubic-bezier(.16,.82,.24,1) .12s,
+        filter 1.45s ease .15s;
+    }
+
+    #ending.show .ending-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+
+    .ending-card::before,
+    .ending-card::after {
+      position: absolute;
+      color: #ff9fc6;
+      opacity: .58;
+      font-family: "Love Ya Like A Sister", cursive;
+      pointer-events: none;
+      animation: floatCute 2.6s ease-in-out infinite;
+    }
+
+    .ending-card::before {
+      content: "♡  ✦";
+      top: 22px;
+      left: 28px;
+      font-size: 1.45rem;
+      transform: rotate(-8deg);
+    }
+
+    .ending-card::after {
+      content: "✦  ♡";
+      right: 28px;
+      bottom: 24px;
+      font-size: 1.35rem;
+      transform: rotate(8deg);
+      animation-delay: -.9s;
+    }
+
+    .ending-kicker {
+      margin: 4px 0 0 !important;
+      color: #ff9fc6 !important;
+      font-size: 1rem !important;
+      letter-spacing: .04em;
+    }
+
+    .ending-card h2 {
+      margin: 2px 0 10px;
+      font-family: "Love Light", cursive;
+      color: var(--ending-title);
+      font-size: clamp(3.1rem, 9vw, 5.6rem);
+      line-height: 1.05;
+      letter-spacing: .005em;
+    }
+
+    .heart-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin: -2px 0 15px;
+      color: #ff91bd;
+      font-size: 1.15rem;
+    }
+
+    .heart-row span:nth-child(2) {
+      font-size: .8rem;
+      opacity: .8;
+    }
+
+    .ending-card p {
+      margin: 0 auto 24px;
+      max-width: 585px;
+      color: var(--ending-copy);
+      line-height: 1.7;
+      font-size: 1.08rem;
+    }
+
+    .forever-pill {
+      display: inline-block;
+      margin: 0 auto 22px;
+      padding: 9px 16px;
+      border: 1px solid rgba(255, 145, 190, .34);
+      border-radius: 999px;
+      color: var(--ending-copy);
+      background: rgba(255, 132, 182, .10);
+      font-size: .94rem;
+    }
+
+    .ending-main-heart {
+      margin-bottom: -4px;
+      filter: drop-shadow(0 8px 18px rgba(255, 87, 157, .28));
+    }
+
+    .heart {
+      font-size: 4.35rem;
+      animation: beat 1.1s infinite;
+    }
+
+
+    @keyframes floatCute {
+      50% { translate: 0 -7px; }
+    }
+
+    @keyframes beat {
+      50% { transform: scale(1.14); }
+    }
+
+    @media (max-width: 600px) {
+      .start-card h1 {
+        font-size: clamp(2rem, 11.2vw, 3.2rem);
+        letter-spacing: 0;
+        word-spacing: .02em;
+      }
+
+      #progressWrap {
+        top: auto;
+        bottom: 92px;
+        left: 50%;
+        right: auto;
+        width: min(320px, calc(100% - 28px));
+        transform: translateX(-50%);
+      }
+
+      #message { top: 14px; }
+
+      .cinematic-frame {
+        min-height: 270px;
+        padding: 38px 22px;
+      }
+
+      #cinematicText {
+        width: min(560px, 100%);
+        max-width: 560px;
+        min-height: 7.2em;
+        font-size: clamp(1rem, 4.6vw, 1.22rem);
+        line-height: 1.62;
+      }
+
+      .key {
+        width: 54px;
+        height: 54px;
+        font-size: 26px;
+        font-weight: 400;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!--
+    PERSONALIZE THIS GAME:
+    1. Edit the CONFIG object near the top of the script.
+    2. This edition contains 143 platforms and a cinematic three-beat intro.
+    3. The title fades in around 0:08–0:09.
+    4. The palette changes from night to day between 1:24 and 1:29.
+    5. Love Light and Love Ya Like A Sister load through Google Fonts.
+    5. Keep background.mp3 beside this HTML file.
+    6. The jump sound effect is generated in-browser.
+    7. Optional voice notes can also be placed beside this HTML file:
+       voice1.mp3, voice2.mp3, voice3.mp3, voice4.mp3, voice5.mp3, voice6.mp3
+    8. Send the entire folder together.
+  -->
+
+  <canvas id="game"></canvas>
+
+  <div id="startScreen">
+    <div class="start-card">
+      <button id="startButton">Begin</button>
+    </div>
+  </div>
+
+  <div id="hud">
+    <div id="message"></div>
+    <div id="progressWrap"><div id="progress"></div></div>
+  </div>
+
+
+  <div
+    id="cinematicNote"
+    role="dialog"
+    aria-modal="true"
+    aria-live="polite"
+    aria-label="Love note"
+  >
+    <div class="cinematic-frame">
+      <div id="cinematicPlatform"></div>
+      <p id="cinematicText"></p>
+      <div class="cinematic-heart" aria-hidden="true">♡ · ✦ · ♡</div>
+    </div>
+  </div>
+
+  <div id="controls" aria-label="Game controls">
+    <button class="key" data-key="A">A</button>
+    <button class="key" data-key="W">W</button>
+    <button class="key" data-key="S">S</button>
+    <button class="key" data-key="D">D</button>
+  </div>
+
+  <div id="ending">
+    <div class="ending-card">
+      <div class="heart ending-main-heart">💗</div>
+      <h2>Together Forever!</h2>
+      <div class="heart-row" aria-hidden="true"><span>♡</span><span>✦</span><span>♡</span></div>
+      <p id="endingText"></p>
+      <div class="forever-pill">Happy Girlfriends Day My Love ♡</div>
+    </div>
+  </div>
+
+  <audio id="backgroundMusic" loop preload="auto" playsinline src="background.mp3"></audio>
+  <audio id="voice1" preload="auto" src="voice1.mp3"></audio>
+  <audio id="voice2" preload="auto" src="voice2.mp3"></audio>
+  <audio id="voice3" preload="auto" src="voice3.mp3"></audio>
+  <audio id="voice4" preload="auto" src="voice4.mp3"></audio>
+  <audio id="voice5" preload="auto" src="voice5.mp3"></audio>
+  <audio id="voice6" preload="auto" src="voice6.mp3"></audio>
+  <audio id="introVoice" preload="auto" src="intro_voice.mp3"></audio>
+
+<script>
+(() => {
+  "use strict";
+
+  const CONFIG = {
+    herName: "Treiorika",
+    yourName: "Kyle",
+    title: "Closing the Distance",
+    endingMessage:
+      "You made it baby, now you're here with me, right where you belong. No ocean, mountain, or time zone can get in between us, our love is stronger than all of that. No matter how long it takes, one day, we will be together. I love you, more than anything and everything, always and forever.",
+    voiceNotes: [
+      {
+        platform: 20,
+        audioId: "voice1",
+        audioDuration: 9.864,
+        typingDuration: 9.314,
+        caption:
+          "It's crazy how far we've come, I can still remember the day we first met. Ever since fate let us unite, we've been inseparable."
+      },
+      {
+        platform: 40,
+        audioId: "voice2",
+        audioDuration: 8.616,
+        typingDuration: 8.066,
+        caption:
+          "Being your boyfriend is the greatest thing ever, and what makes it even better is that I get to be with you every single day."
+      },
+      {
+        platform: 60,
+        audioId: "voice3",
+        audioDuration: 7.776,
+        typingDuration: 7.226,
+        caption:
+          "You are my love, my peace, and my home. I wouldn't know what to do without you, life would be so empty."
+      },
+      {
+        platform: 80,
+        audioId: "voice4",
+        audioDuration: 6.720,
+        typingDuration: 6.170,
+        caption:
+          "We have the brightest future ahead of us. Let's achieve all of our goals and dreams together, my love."
+      },
+      {
+        platform: 100,
+        audioId: "voice5",
+        audioDuration: 7.392,
+        typingDuration: 6.842,
+        caption:
+          "Your smile, your personality, everything about you is so perfect. I truly am the luckiest."
+      },
+      {
+        platform: 120,
+        audioId: "voice6",
+        audioDuration: 8.136,
+        typingDuration: 7.586,
+        caption:
+          "I can't wait to finally meet. I'm so excited counting down the days. I love you my Treiorika."
+      }
+    ]
+  };
+
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const startScreen = document.getElementById("startScreen");
+  const startButton = document.getElementById("startButton");
+  const controls = document.getElementById("controls");
+  const message = document.getElementById("message");
+  const progress = document.getElementById("progress");
+  const ending = document.getElementById("ending");
+  const endingText = document.getElementById("endingText");
+  const cinematicNoteOverlay =
+    document.getElementById("cinematicNote");
+  const cinematicPlatform =
+    document.getElementById("cinematicPlatform");
+  const cinematicText =
+    document.getElementById("cinematicText");
+  const backgroundMusic = document.getElementById("backgroundMusic");
+
+  const characterPhotos = {
+    her: new Image(),
+    you: new Image()
+  };
+
+  characterPhotos.her.decoding = "async";
+  characterPhotos.you.decoding = "async";
+  characterPhotos.her.src = "treiorika_sticker.png";
+  characterPhotos.you.src = "kyle_sticker.png";
+
+  let W = innerWidth;
+  let H = innerHeight;
+  let dpr = Math.min(devicePixelRatio || 1, innerWidth < 700 ? 1.1 : 1.35);
+  let gameInitialized = false;
+
+  function resize() {
+    W = innerWidth;
+    H = innerHeight;
+    dpr = Math.min(
+      devicePixelRatio || 1,
+      W < 700 ? 1.1 : 1.35
+    );
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Rebuild cached heart sprites only after the game has initialized.
+    if (gameInitialized) {
+      buildTransitionHeartSprites();
+      rebuildFlowerLayouts();
+    }
+  }
+  addEventListener("resize", resize);
+
+  const keys = ["A", "W", "S", "D"];
+  const platformCount = 143;
+  const platformSpacing = 205;
+  const waterYRatio = 0.72;
+
+  // Fixed 142-step sequence for the complete 143-platform journey.
+  const keySequence =
+    "WSSWSSDWAWAWDSADDWADASASSWAAWSSADWDDAADDAWWASSWSDWDAAWWDADWSAASDWWAWAWSASDAADSSWDWADAASASAWDSDSDAWSWSASWDSSWDDWAAWAAWWADADDAASADDWWDSWAWWASDAS";
+
+  const platforms = [];
+  for (let i = 0; i < platformCount; i++) {
+    const x = 160 + i * platformSpacing;
+    const wave = Math.sin(i * 1.17) * 38;
+    const secondaryWave = Math.sin(i * 0.43) * 16;
+    const yOffset =
+      (i % 4 === 0 ? -22 : i % 4 === 2 ? 18 : 0) +
+      wave * 0.35 +
+      secondaryWave;
+
+    platforms.push({
+      x,
+      baseYOffset: yOffset,
+      width: i === 0 || i === platformCount - 1 ? 150 : 110,
+      key: i === 0 ? null : keySequence[i - 1]
+    });
+  }
+
+  const player = {
+    platform: 0,
+    x: platforms[0].x,
+    y: 0,
+    fromX: 0,
+    fromY: 0,
+    targetX: 0,
+    targetY: 0,
+    jumpT: 0,
+    jumping: false,
+    facing: 1,
+    bob: 0
+  };
+
+  const partner = {
+    x: platforms[platformCount - 1].x + 16,
+    y: 0,
+    facing: -1
+  };
+
+  let state = "idle";
+  let stateTime = 0;
+  let lastTime = performance.now();
+  let cameraX = 0;
+  let cameraTarget = 0;
+  let wrongShake = 0;
+  let correctKeyFeedback = null;
+  let wrongKeyFeedback = null;
+  let correctKeyButtonTimeout = null;
+  let wrongKeyButtonTimeout = null;
+  let introTitleAlpha = 0;
+  let introBlack = 1;
+  let introVoicePlayed = false;
+  let messageTimeout = null;
+  let heartParticles = [];
+  let transitionHearts = [];
+  let transitionHeartSprites = [];
+  let transitionSparkles = [];
+  let transitionSpawnAccumulator = 0;
+  let transitionBurstAccumulator = 0;
+  let endingCelebrationStage = 0;
+  let transitionWash = 0;
+  let backgroundHearts = [];
+  let heartSpawnAccumulator = 0;
+  let dayProgress = 0;
+  let daylightLocked = false;
+  let sunriseFlash = 0;
+  let sunriseFlashTriggered = false;
+  let reachedVoiceNotes = new Set();
+  let activeCinematicNote = null;
+  let waitingCinematicNote = null;
+  let activeCinematicAudio = null;
+  let cinematicAudioStarted = false;
+  let cinematicAudioFinished = true;
+  let cinematicTypedCharacters = 0;
+  let musicFadeToken = 0;
+  let finaleMusicSyncStarted = false;
+  let finaleMusicSegmentStarted = false;
+
+  const flowerLayouts = {
+    back: [],
+    front: []
+  };
+
+  // The uploaded MP3 provides the background music.
+  // Web Audio is still used for the short jump sound effect.
+  let audioContext = null;
+  let effectsGain = null;
+  let audioEnabled = true;
+  const normalMusicVolume = 0.56;
+  const duckedMusicVolume = 0.15;
+
+  backgroundMusic.volume = normalMusicVolume;
+
+  function ensureAudio() {
+    if (audioContext) {
+      if (audioContext.state === "suspended") audioContext.resume();
+      return;
+    }
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+
+    audioContext = new AudioCtx();
+    effectsGain = audioContext.createGain();
+    effectsGain.gain.value = 0.24;
+    effectsGain.connect(audioContext.destination);
+
+    attachVoiceNoteDucking();
+  }
+
+  function startBackgroundMusic() {
+    backgroundMusic.muted = !audioEnabled;
+    backgroundMusic.volume = normalMusicVolume;
+
+    const playAttempt = backgroundMusic.play();
+    if (playAttempt && typeof playAttempt.catch === "function") {
+      playAttempt.catch(() => {
+        showMessage("Tap Begin again if the music does not start.", 2400);
+      });
+    }
+  }
+
+  function playJumpSound() {
+    ensureAudio();
+    if (!audioContext || !effectsGain || !audioEnabled) return;
+
+    const now = audioContext.currentTime;
+    const jumpGain = audioContext.createGain();
+    const jumpTone = audioContext.createOscillator();
+    const sparkle = audioContext.createOscillator();
+
+    jumpTone.type = "sine";
+    jumpTone.frequency.setValueAtTime(285, now);
+    jumpTone.frequency.exponentialRampToValueAtTime(610, now + 0.16);
+
+    sparkle.type = "triangle";
+    sparkle.frequency.setValueAtTime(520, now);
+    sparkle.frequency.exponentialRampToValueAtTime(870, now + 0.12);
+
+    jumpGain.gain.setValueAtTime(0.0001, now);
+    jumpGain.gain.exponentialRampToValueAtTime(0.19, now + 0.012);
+    jumpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.21);
+
+    jumpTone.connect(jumpGain);
+    sparkle.connect(jumpGain);
+    jumpGain.connect(effectsGain);
+
+    jumpTone.start(now);
+    sparkle.start(now);
+    jumpTone.stop(now + 0.22);
+    sparkle.stop(now + 0.18);
+  }
+
+  function setMusicLevel(level) {
+    backgroundMusic.volume = Math.max(0, Math.min(1, level));
+  }
+
+  function fadeMusicTo(targetLevel, duration = .55) {
+    const token = ++musicFadeToken;
+    const from = backgroundMusic.volume;
+    const target = Math.max(0, Math.min(1, targetLevel));
+    const startedAt = performance.now();
+    const durationMs = Math.max(1, duration * 1000);
+
+    function step(now) {
+      if (token !== musicFadeToken) return;
+
+      const t = clamp((now - startedAt) / durationMs, 0, 1);
+      const eased = t * t * (3 - 2 * t);
+      setMusicLevel(lerp(from, target, eased));
+
+      if (t < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  function beginFinaleMusicSync() {
+    finaleMusicSyncStarted = true;
+    finaleMusicSegmentStarted = true;
+
+    // From this point forward, play only the final 17 seconds.
+    musicFadeToken += 1;
+    backgroundMusic.pause();
+    backgroundMusic.loop = false;
+    backgroundMusic.volume = 0;
+    backgroundMusic.muted = !audioEnabled;
+
+    const playFinalSeventeenSeconds = () => {
+      const songDuration = backgroundMusic.duration;
+
+      if (
+        !Number.isFinite(songDuration) ||
+        songDuration <= 0
+      ) {
+        return;
+      }
+
+      backgroundMusic.currentTime = Math.max(
+        0,
+        songDuration - 27
+      );
+
+      const playAttempt = backgroundMusic.play();
+      if (
+        playAttempt &&
+        typeof playAttempt.catch === "function"
+      ) {
+        playAttempt.catch(() => {});
+      }
+
+      // A soft entrance prevents the seek from sounding abrupt.
+      fadeMusicTo(normalMusicVolume * .92, .42);
+    };
+
+    if (
+      Number.isFinite(backgroundMusic.duration) &&
+      backgroundMusic.duration > 0
+    ) {
+      playFinalSeventeenSeconds();
+    } else {
+      backgroundMusic.addEventListener(
+        "loadedmetadata",
+        playFinalSeventeenSeconds,
+        { once: true }
+      );
+    }
+  }
+
+  function finishFinaleMusicAtCard() {
+    // Nothing is allowed to play after the ending card appears.
+    musicFadeToken += 1;
+    backgroundMusic.volume = 0;
+    backgroundMusic.pause();
+  }
+
+  function attachVoiceNoteDucking() {
+    ["voice1", "voice2", "voice3", "voice4", "voice5", "voice6"].forEach(id => {
+      const audio = document.getElementById(id);
+      if (!audio || audio.dataset.duckingAttached) return;
+
+      audio.dataset.duckingAttached = "true";
+      audio.addEventListener("play", () => {
+        if (state === "cinematicNote") {
+          fadeMusicTo(duckedMusicVolume, .38);
+        }
+      });
+
+      const restoreWhenOutsideScene = () => {
+        if (state !== "cinematicNote") {
+          fadeMusicTo(normalMusicVolume, .48);
+        }
+      };
+
+      audio.addEventListener("pause", restoreWhenOutsideScene);
+      audio.addEventListener("ended", restoreWhenOutsideScene);
+      audio.addEventListener("error", restoreWhenOutsideScene);
+    });
+  }
+
+  function platformY(index) {
+    const waterY = H * waterYRatio;
+
+    // Crumbling stones hover just above the surface, with restrained
+    // height variation so they remain readable as one continuous path.
+    return waterY - 50 + platforms[index].baseYOffset * .34;
+  }
+
+  function resetGame() {
+    player.platform = 0;
+    player.x = platforms[0].x;
+    player.y = platformY(0);
+    player.jumping = false;
+    player.facing = 1;
+    partner.y = platformY(platformCount - 1);
+    cameraX = 0;
+    cameraTarget = 0;
+    state = "title";
+    stateTime = 0;
+    introTitleAlpha = 0;
+    introBlack = 1;
+    introVoicePlayed = false;
+
+    const introVoice = document.getElementById("introVoice");
+    if (introVoice) {
+      introVoice.pause();
+      introVoice.currentTime = 0;
+      introVoice.muted = !audioEnabled;
+    }
+
+    wrongShake = 0;
+    correctKeyFeedback = null;
+    wrongKeyFeedback = null;
+    if (correctKeyButtonTimeout) {
+      clearTimeout(correctKeyButtonTimeout);
+      correctKeyButtonTimeout = null;
+    }
+    if (wrongKeyButtonTimeout) {
+      clearTimeout(wrongKeyButtonTimeout);
+      wrongKeyButtonTimeout = null;
+    }
+    document.querySelectorAll(
+      ".key.correct-glow, .key.incorrect-glow"
+    ).forEach(button => {
+      button.classList.remove("correct-glow", "incorrect-glow");
+    });
+    heartParticles = [];
+    transitionHearts = [];
+    transitionSparkles = [];
+    transitionSpawnAccumulator = 0;
+    transitionBurstAccumulator = 0;
+    endingCelebrationStage = 0;
+    transitionWash = 0;
+    backgroundHearts = [];
+    heartSpawnAccumulator = 0;
+    dayProgress = 0;
+    daylightLocked = false;
+    sunriseFlash = 0;
+    sunriseFlashTriggered = false;
+    reachedVoiceNotes.clear();
+
+    CONFIG.voiceNotes.forEach(note => {
+      const audio = document.getElementById(note.audioId);
+      if (!audio) return;
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    activeCinematicNote = null;
+    waitingCinematicNote = null;
+    activeCinematicAudio = null;
+    cinematicAudioStarted = false;
+    cinematicAudioFinished = true;
+    cinematicTypedCharacters = 0;
+    cinematicNoteOverlay.classList.remove("show");
+    cinematicText.classList.remove("typing");
+    cinematicText.textContent = "";
+    cinematicPlatform.textContent = "";
+    document.body.classList.remove("cinematic-active");
+
+    finaleMusicSyncStarted = false;
+    finaleMusicSegmentStarted = false;
+    musicFadeToken += 1;
+    backgroundMusic.loop = true;
+    setMusicLevel(normalMusicVolume);
+
+    progress.style.width = "0%";
+    ending.classList.remove("show");
+    controls.classList.remove("show");
+    hideMessage();
+  }
+
+  function showMessage(text, duration = 2400) {
+    clearTimeout(messageTimeout);
+    message.textContent = text;
+    message.classList.add("show");
+    messageTimeout = setTimeout(hideMessage, duration);
+  }
+
+  function hideMessage() {
+    message.classList.remove("show");
+  }
+
+  function startGame() {
+    // Reset before playback so no intro setup can interrupt the song.
+    resetGame();
+    startScreen.classList.add("hidden");
+    ensureAudio();
+
+    // Keep this play() call directly inside the Begin button gesture.
+    backgroundMusic.pause();
+    backgroundMusic.loop = true;
+    backgroundMusic.currentTime = 0;
+    backgroundMusic.muted = !audioEnabled;
+    backgroundMusic.volume = normalMusicVolume;
+
+    const playAttempt = backgroundMusic.play();
+    if (playAttempt && typeof playAttempt.catch === "function") {
+      playAttempt.catch(() => {
+        showMessage(
+          "Tap anywhere once if the music does not start.",
+          2600
+        );
+
+        const retryMusic = () => {
+          backgroundMusic.muted = !audioEnabled;
+          backgroundMusic.volume = normalMusicVolume;
+          backgroundMusic.play().catch(() => {});
+        };
+
+        document.addEventListener("pointerdown", retryMusic, {
+          once: true
+        });
+      });
+    }
+  }
+
+  startButton.addEventListener("click", startGame);
+
+  document.querySelectorAll(".key").forEach(btn => {
+    btn.addEventListener("click", () => handleInput(btn.dataset.key));
+  });
+
+  addEventListener("keydown", event => {
+    const key = event.key.toUpperCase();
+    if (keys.includes(key)) {
+      event.preventDefault();
+      handleInput(key);
+    }
+  });
+
+  function triggerCorrectKeyFeedback(key, index) {
+    wrongKeyFeedback = null;
+    correctKeyFeedback = {
+      key,
+      index,
+      age: 0,
+      duration: .60
+    };
+
+    const button = document.querySelector(
+      `.key[data-key="${key}"]`
+    );
+
+    if (button) {
+      button.classList.remove("incorrect-glow", "correct-glow");
+      void button.offsetWidth;
+      button.classList.add("correct-glow");
+
+      if (correctKeyButtonTimeout) {
+        clearTimeout(correctKeyButtonTimeout);
+      }
+      correctKeyButtonTimeout = setTimeout(() => {
+        button.classList.remove("correct-glow");
+        correctKeyButtonTimeout = null;
+      }, 610);
+    }
+  }
+
+  function triggerWrongKeyFeedback(
+    pressedKey,
+    correctKey,
+    index
+  ) {
+    correctKeyFeedback = null;
+    wrongKeyFeedback = {
+      pressedKey,
+      correctKey,
+      index,
+      age: 0,
+      duration: .64
+    };
+
+    const button = document.querySelector(
+      `.key[data-key="${pressedKey}"]`
+    );
+
+    if (button) {
+      button.classList.remove("correct-glow", "incorrect-glow");
+      void button.offsetWidth;
+      button.classList.add("incorrect-glow");
+
+      if (wrongKeyButtonTimeout) {
+        clearTimeout(wrongKeyButtonTimeout);
+      }
+      wrongKeyButtonTimeout = setTimeout(() => {
+        button.classList.remove("incorrect-glow");
+        wrongKeyButtonTimeout = null;
+      }, 650);
+    }
+  }
+
+  function handleInput(key) {
+    if (state !== "play" || player.jumping) return;
+
+    const nextIndex = player.platform + 1;
+    if (nextIndex >= platforms.length) return;
+
+    const correct = platforms[nextIndex].key;
+    if (key === correct) {
+      triggerCorrectKeyFeedback(correct, nextIndex);
+      beginJump(nextIndex);
+    } else {
+      wrongShake = 8;
+      triggerWrongKeyFeedback(key, correct, nextIndex);
+      showMessage("Not that one — try " + correct + " 💗", 850);
+    }
+  }
+
+
+  function beginJump(nextIndex) {
+    playJumpSound();
+    player.jumping = true;
+    player.jumpT = 0;
+    player.fromX = player.x;
+    player.fromY = player.y;
+    player.targetX = platforms[nextIndex].x;
+    player.targetY = platformY(nextIndex);
+    player.facing = 1;
+  }
+
+  function completeJump() {
+    player.jumping = false;
+    player.platform += 1;
+    player.x = platforms[player.platform].x;
+    player.y = platformY(player.platform);
+
+    const pct = (player.platform / (platforms.length - 1)) * 100;
+    progress.style.width = pct + "%";
+
+    const cinematicStarted =
+      maybeStartCinematicNote(player.platform);
+
+    if (
+      !cinematicStarted &&
+      player.platform === platforms.length - 1
+    ) {
+      state = "reunion";
+      stateTime = 0;
+      controls.classList.remove("show");
+      beginFinaleMusicSync();
+    }
+  }
+
+  function cinematicSceneDuration(note) {
+    const typingDelay = .52;
+    const activeLength = Math.max(
+      note.typingDuration || 0,
+      note.audioDuration || 0
+    );
+
+    return typingDelay + activeLength + 1.35;
+  }
+
+  function shouldDelayCinematicNote(note) {
+    const musicTime = Number.isFinite(
+      backgroundMusic.currentTime
+    )
+      ? backgroundMusic.currentTime
+      : 0;
+
+    // The transition begins at 1:24. If the full note would
+    // overlap it, wait. After sunrise reaches its destination, also
+    // wait for the remaining bloom to settle completely.
+    if (!daylightLocked) {
+      const transitionStart = 84;
+      const safetyMargin = .55;
+      return (
+        musicTime +
+        cinematicSceneDuration(note) +
+        safetyMargin >=
+        transitionStart
+      );
+    }
+
+    return sunriseFlash > .02;
+  }
+
+  function maybeStartCinematicNote(index) {
+    const noteIndex = CONFIG.voiceNotes.findIndex(
+      item => item.platform === index
+    );
+    const note = CONFIG.voiceNotes[noteIndex];
+
+    if (!note || reachedVoiceNotes.has(index)) return false;
+
+    reachedVoiceNotes.add(index);
+    note.noteNumber = noteIndex + 1;
+
+    if (shouldDelayCinematicNote(note)) {
+      waitingCinematicNote = note;
+      state = "noteWait";
+      stateTime = 0;
+      controls.classList.remove("show");
+      hideMessage();
+      return true;
+    }
+
+    startCinematicNote(note);
+    return true;
+  }
+
+  function startCinematicNote(note) {
+    waitingCinematicNote = null;
+    activeCinematicNote = note;
+    activeCinematicAudio = null;
+    cinematicAudioStarted = false;
+    cinematicAudioFinished = true;
+    cinematicTypedCharacters = 0;
+
+    state = "cinematicNote";
+    stateTime = 0;
+    controls.classList.remove("show");
+    hideMessage();
+
+    const romanNumerals = ["I", "II", "III", "IV", "V", "VI"];
+    cinematicPlatform.textContent =
+      `Note ${romanNumerals[note.noteNumber - 1]}`;
+    cinematicText.textContent = "";
+    cinematicText.classList.add("typing");
+    cinematicNoteOverlay.classList.add("show");
+    document.body.classList.add("cinematic-active");
+
+    fadeMusicTo(duckedMusicVolume, .65);
+
+    const audio = document.getElementById(note.audioId);
+    if (!audio || !audioEnabled) return;
+
+    activeCinematicAudio = audio;
+    cinematicAudioFinished = false;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.muted = false;
+
+    const markFinished = () => {
+      if (activeCinematicAudio === audio) {
+        cinematicAudioFinished = true;
+      }
+    };
+
+    audio.onended = markFinished;
+    audio.onerror = markFinished;
+  }
+
+  function appendCinematicCharacter(character) {
+    const characterSpan = document.createElement("span");
+    characterSpan.className = "cinematic-char";
+    characterSpan.textContent = character;
+    cinematicText.appendChild(characterSpan);
+  }
+
+  function updateCinematicNote() {
+    if (!activeCinematicNote) {
+      endCinematicNote();
+      return;
+    }
+
+    const typingDelay = .52;
+    const text = activeCinematicNote.caption;
+    const typingDuration = Math.max(
+      .2,
+      activeCinematicNote.typingDuration ||
+      text.length / 20
+    );
+
+    if (
+      !cinematicAudioStarted &&
+      stateTime >= typingDelay
+    ) {
+      cinematicAudioStarted = true;
+
+      if (activeCinematicAudio) {
+        const playAttempt = activeCinematicAudio.play();
+
+        if (
+          playAttempt &&
+          typeof playAttempt.catch === "function"
+        ) {
+          playAttempt.catch(() => {
+            cinematicAudioFinished = true;
+          });
+        }
+      } else {
+        cinematicAudioFinished = true;
+      }
+    }
+
+    const typingProgress = clamp(
+      (stateTime - typingDelay) / typingDuration,
+      0,
+      1
+    );
+    const typedCount = Math.min(
+      text.length,
+      Math.floor(typingProgress * text.length)
+    );
+
+    while (cinematicTypedCharacters < typedCount) {
+      appendCinematicCharacter(
+        text[cinematicTypedCharacters]
+      );
+      cinematicTypedCharacters += 1;
+    }
+
+    const typingFinished =
+      cinematicTypedCharacters >= text.length;
+    cinematicText.classList.toggle(
+      "typing",
+      !typingFinished
+    );
+
+    const activeLength = Math.max(
+      typingDuration,
+      activeCinematicNote.audioDuration || 0
+    );
+    const earliestEnd =
+      typingDelay + activeLength + 1.25;
+    const audioReady =
+      cinematicAudioFinished ||
+      stateTime > earliestEnd + 3;
+
+    if (
+      typingFinished &&
+      audioReady &&
+      stateTime >= earliestEnd
+    ) {
+      endCinematicNote();
+    }
+  }
+
+  function endCinematicNote() {
+    if (activeCinematicAudio) {
+      activeCinematicAudio.pause();
+      activeCinematicAudio.currentTime = 0;
+    }
+
+    activeCinematicAudio = null;
+    activeCinematicNote = null;
+    cinematicAudioStarted = false;
+    cinematicAudioFinished = true;
+    cinematicTypedCharacters = 0;
+
+    cinematicNoteOverlay.classList.remove("show");
+    cinematicText.classList.remove("typing");
+    document.body.classList.remove("cinematic-active");
+    fadeMusicTo(normalMusicVolume, .72);
+
+    state = "play";
+    stateTime = 0;
+    controls.classList.add("show");
+  }
+
+  function update(dt) {
+    stateTime += dt;
+
+    if (state === "cinematicNote") {
+      updateCinematicNote();
+      return;
+    }
+
+    player.bob += dt * 2.4;
+
+    if (wrongShake > 0) wrongShake = Math.max(0, wrongShake - dt * 40);
+
+    if (correctKeyFeedback) {
+      correctKeyFeedback.age += dt;
+      if (correctKeyFeedback.age >= correctKeyFeedback.duration) {
+        correctKeyFeedback = null;
+      }
+    }
+
+    if (wrongKeyFeedback) {
+      wrongKeyFeedback.age += dt;
+      if (wrongKeyFeedback.age >= wrongKeyFeedback.duration) {
+        wrongKeyFeedback = null;
+      }
+    }
+
+    // The scene begins changing at 1:24 and reaches full daylight at 1:29.
+    // Once daylight arrives, it remains even if the song later loops.
+    const musicTime = Number.isFinite(backgroundMusic.currentTime)
+      ? backgroundMusic.currentTime
+      : 0;
+
+    if (!daylightLocked) {
+      const targetDaylight = clamp((musicTime - 84) / 5, 0, 1);
+      dayProgress = lerp(dayProgress, targetDaylight, Math.min(1, dt * 2.4));
+
+      // Begin the bloom as soon as the sun starts becoming visible.
+      if (dayProgress >= .075 && !sunriseFlashTriggered) {
+        sunriseFlashTriggered = true;
+        sunriseFlash = 0;
+      }
+
+      if (sunriseFlashTriggered) {
+        sunriseFlash = smoothstep(
+          clamp((dayProgress - .075) / .85, 0, 1)
+        );
+      }
+
+      if (musicTime >= 89 || dayProgress > 0.995) {
+        dayProgress = 1;
+        daylightLocked = true;
+        sunriseFlash = 1;
+      }
+    } else {
+      dayProgress = 1;
+
+      // Once the sun reaches its final position, let the bloom linger,
+      // then fade over a little more than two seconds.
+      if (sunriseFlash > 0) {
+        sunriseFlash = Math.max(0, sunriseFlash - dt * .44);
+      }
+    }
+
+    setUiPalette(dayProgress);
+
+    if (state !== "title") {
+      heartSpawnAccumulator += dt;
+      const spawnInterval = lerp(0.72, 0.52, dayProgress);
+
+      while (heartSpawnAccumulator >= spawnInterval) {
+        heartSpawnAccumulator -= spawnInterval;
+        spawnBackgroundHeart();
+      }
+    }
+
+    backgroundHearts.forEach(heart => {
+      heart.y += heart.speed * dt;
+      heart.x += Math.sin(heart.phase + heart.y * 0.012) * heart.drift * dt;
+      heart.rotation += heart.spin * dt;
+      heart.phase += dt * 0.8;
+    });
+    backgroundHearts = backgroundHearts.filter(heart => heart.y < H + 70);
+
+    if (state === "noteWait") {
+      cameraTarget = Math.max(0, player.x - W * 0.34);
+
+      if (
+        waitingCinematicNote &&
+        !shouldDelayCinematicNote(waitingCinematicNote)
+      ) {
+        startCinematicNote(waitingCinematicNote);
+      }
+    }
+
+    else if (state === "title") {
+      introBlack = 1;
+
+      if (stateTime >= 1.40 && !introVoicePlayed) {
+        introVoicePlayed = true;
+        const introVoice = document.getElementById("introVoice");
+
+        if (introVoice && audioEnabled) {
+          setMusicLevel(normalMusicVolume);
+          introVoice.currentTime = 0;
+          introVoice.muted = false;
+          introVoice.play().catch(() => {
+            setMusicLevel(normalMusicVolume);
+          });
+        }
+      }
+
+      // Original text and title pacing, shifted so the title begins
+      // appearing at exactly nine seconds.
+      if (stateTime > 13.35) {
+        state = "revealHer";
+        stateTime = 0;
+      }
+    }
+
+    else if (state === "revealHer") {
+      introBlack = Math.max(0, 1 - stateTime / 2.1);
+      cameraTarget = 0;
+
+      if (stateTime > 1.15 && stateTime < 1.15 + dt) {
+        showMessage("On one side of the distance, you, are there.", 2600);
+      }
+
+      if (stateTime > 4.0) {
+        state = "panToYou";
+        stateTime = 0;
+        showMessage("Between us, a pink sea... and one hundred forty-three steps.", 3500);
+      }
+    }
+
+    else if (state === "panToYou") {
+      const farCamera = Math.max(0, partner.x - W * 0.58);
+      const panProgress = smootherstep(stateTime / 9.25);
+      cameraTarget = lerp(0, farCamera, panProgress);
+
+      if (stateTime > 5.15 && stateTime < 5.15 + dt) {
+        showMessage("The camera keeps moving, farther and farther.", 3000);
+      }
+
+      if (stateTime > 9.25) {
+        cameraTarget = farCamera;
+        state = "lingerOnYou";
+        stateTime = 0;
+        showMessage("And at the very end, I, am waiting.", 3300);
+      }
+    }
+
+    else if (state === "lingerOnYou") {
+      cameraTarget = partner.x - W * 0.58;
+
+      if (stateTime > 3.5) {
+        state = "panBack";
+        stateTime = 0;
+        showMessage("There is only one way forward.", 2500);
+      }
+    }
+
+    else if (state === "panBack") {
+      const farCamera = Math.max(0, partner.x - W * 0.58);
+      const returnProgress = smootherstep(stateTime / 7.5);
+      cameraTarget = lerp(farCamera, 0, returnProgress);
+
+      if (stateTime > 4.75 && stateTime < 4.75 + dt) {
+        showMessage("Let's close the distance, one jump at a time.", 2800);
+      }
+
+      if (stateTime > 7.5) {
+        cameraTarget = 0;
+        state = "play";
+        stateTime = 0;
+        controls.classList.add("show");
+        showMessage("Press the key shown, my baby.", 3000);
+      }
+    }
+
+    else if (state === "play") {
+      cameraTarget = Math.max(0, player.x - W * 0.34);
+
+      if (player.jumping) {
+        player.jumpT = Math.min(1, player.jumpT + dt * 1.95);
+        const t = player.jumpT;
+        const eased = t * t * (3 - 2 * t);
+        player.x = lerp(player.fromX, player.targetX, eased);
+        player.y = lerp(player.fromY, player.targetY, eased) - Math.sin(Math.PI * t) * 115;
+
+        if (t >= 1) completeJump();
+      }
+    }
+
+    else if (state === "reunion") {
+      const finalPlatformX = platforms[platforms.length - 1].x;
+      cameraTarget = Math.max(0, finalPlatformX - W * 0.50);
+
+      // Keep the pair balanced around the 150px-wide final platform.
+      const meetX = finalPlatformX;
+      player.x = lerp(player.x, meetX - 29, Math.min(1, dt * 2.2));
+      partner.x = lerp(partner.x, meetX + 21, Math.min(1, dt * 2.2));
+
+      if (stateTime > 0.72 && heartParticles.length < 85) {
+        for (let i = 0; i < 4; i++) {
+          spawnHeart(meetX, platformY(platforms.length - 1) - 72);
+        }
+      }
+
+      if (stateTime > 2.65) {
+        state = "heartFlood";
+        stateTime = 0;
+        transitionHearts = [];
+        transitionSparkles = [];
+        transitionSpawnAccumulator = 0;
+        transitionBurstAccumulator = 0;
+        endingCelebrationStage = 0;
+        transitionWash = 0;
+        spawnTransitionBurst(W * .5, H * .54, 38, 55, 220);
+        spawnSparkleBurst(W * .5, H * .54, 34, 70, 230);
+      }
+    }
+
+    else if (state === "heartFlood") {
+      const finalPlatformX = platforms[platforms.length - 1].x;
+      cameraTarget = Math.max(0, finalPlatformX - W * 0.50);
+
+      // A shorter, lighter celebration that keeps the same staged rhythm.
+      let heartsPerSecond = 0;
+      let burstInterval = 999;
+
+      if (stateTime < 2.54) {
+        heartsPerSecond = stateTime < 1.20 ? 235 : 310;
+        burstInterval = .98;
+        transitionWash = clamp((stateTime - 1.02) / 2.40, 0, .30);
+      } else if (stateTime < 9.19) {
+        heartsPerSecond = 82;
+        burstInterval = .98;
+        transitionWash = .30 + Math.sin(stateTime * 1.7) * .020;
+      } else if (stateTime < 11.88) {
+        heartsPerSecond = 112;
+        burstInterval = .74;
+        transitionWash = clamp(
+          .38 + (stateTime - 9.19) * .053,
+          0,
+          .56
+        );
+      } else {
+        heartsPerSecond = 158;
+        burstInterval = .56;
+        transitionWash = clamp(
+          .56 + (stateTime - 11.88) * .163,
+          0,
+          .95
+        );
+      }
+
+      transitionSpawnAccumulator += dt * heartsPerSecond;
+      transitionBurstAccumulator += dt;
+
+      const availableSlots = Math.max(
+        0,
+        480 - transitionHearts.length
+      );
+      const spawnCount = Math.min(
+        availableSlots,
+        Math.floor(transitionSpawnAccumulator)
+      );
+      transitionSpawnAccumulator -= spawnCount;
+
+      for (let i = 0; i < spawnCount; i++) {
+        spawnTransitionHeart(stateTime);
+      }
+
+      while (transitionBurstAccumulator >= burstInterval) {
+        transitionBurstAccumulator -= burstInterval;
+
+        const burstX = W * (.24 + Math.random() * .52);
+        const burstY = H * (.22 + Math.random() * .40);
+        const earlyBurst = stateTime < 9.19;
+        const burstCount = earlyBurst
+          ? 18 + Math.floor(Math.random() * 11)
+          : 24 + Math.floor(Math.random() * 15);
+
+        spawnTransitionBurst(
+          burstX,
+          burstY,
+          burstCount,
+          earlyBurst ? 52 : 70,
+          earlyBurst ? 225 : 300
+        );
+        spawnSparkleBurst(
+          burstX,
+          burstY,
+          8 + Math.floor(Math.random() * 9),
+          65,
+          earlyBurst ? 220 : 305
+        );
+      }
+
+      if (stateTime > 2.29 && endingCelebrationStage < 1) {
+        endingCelebrationStage = 1;
+        spawnTransitionBurst(W * .28, H * .46, 58, 70, 300);
+        spawnTransitionBurst(W * .72, H * .46, 58, 70, 300);
+        spawnSparkleBurst(W * .28, H * .46, 30, 90, 325);
+        spawnSparkleBurst(W * .72, H * .46, 30, 90, 325);
+      }
+
+      if (stateTime > 3.73 && endingCelebrationStage < 2) {
+        endingCelebrationStage = 2;
+        spawnHeartRing(W * .5, H * .44, 95, 215);
+        spawnSparkleBurst(W * .5, H * .44, 48, 100, 340);
+      }
+
+      if (stateTime > 5.80 && endingCelebrationStage < 3) {
+        endingCelebrationStage = 3;
+        spawnTransitionBurst(W * .18, H * .30, 48, 75, 315);
+        spawnTransitionBurst(W * .50, H * .22, 62, 82, 345);
+        spawnTransitionBurst(W * .82, H * .30, 48, 75, 315);
+        spawnSparkleBurst(W * .5, H * .28, 60, 95, 370);
+      }
+
+      if (stateTime > 7.45 && endingCelebrationStage < 4) {
+        endingCelebrationStage = 4;
+        spawnHeartRing(W * .5, H * .53, 125, 285);
+        spawnTransitionBurst(W * .5, H * .53, 82, 82, 390);
+        spawnSparkleBurst(W * .5, H * .53, 72, 108, 420);
+      }
+
+      if (stateTime > 9.00 && endingCelebrationStage < 5) {
+        endingCelebrationStage = 5;
+        const finalePoints = [
+          [W * .20, H * .42],
+          [W * .40, H * .25],
+          [W * .60, H * .25],
+          [W * .80, H * .42],
+          [W * .50, H * .52]
+        ];
+
+        finalePoints.forEach(([x, y], index) => {
+          spawnTransitionBurst(
+            x,
+            y,
+            index === 4 ? 92 : 48,
+            88,
+            395
+          );
+          spawnSparkleBurst(
+            x,
+            y,
+            index === 4 ? 70 : 34,
+            108,
+            430
+          );
+        });
+      }
+
+      if (stateTime > 9.35) {
+        finishFinaleMusicAtCard();
+        state = "ending";
+        stateTime = 0;
+        endingText.textContent = CONFIG.endingMessage;
+        ending.classList.add("show");
+      }
+    }
+
+    cameraX = lerp(cameraX, cameraTarget, Math.min(1, dt * 3.15));
+
+    heartParticles.forEach(p => {
+      p.y += p.vy * dt;
+      p.x += p.vx * dt;
+      p.life -= dt;
+      p.rotation += p.spin * dt;
+    });
+    heartParticles = heartParticles.filter(p => p.life > 0);
+
+    transitionHearts.forEach(heart => {
+      heart.x += heart.vx * dt;
+      heart.y += heart.vy * dt;
+      heart.rotation += heart.spin * dt;
+      heart.scale += heart.growth * dt;
+      heart.life -= dt;
+    });
+    transitionHearts = transitionHearts.filter(heart => heart.life > 0);
+
+    transitionSparkles.forEach(sparkle => {
+      sparkle.x += sparkle.vx * dt;
+      sparkle.y += sparkle.vy * dt;
+      sparkle.vy += sparkle.gravity * dt;
+      sparkle.rotation += sparkle.spin * dt;
+      sparkle.life -= dt;
+    });
+    transitionSparkles = transitionSparkles.filter(sparkle => sparkle.life > 0);
+  }
+
+  function spawnHeart(x, y) {
+    const spriteOffset = dayProgress > .7 ? 4 : 0;
+    const paletteLength = dayProgress > .7 ? 5 : 4;
+
+    heartParticles.push({
+      x: x + (Math.random() - .5) * 85,
+      y: y + (Math.random() - .5) * 30,
+      vx: (Math.random() - .5) * 45,
+      vy: -45 - Math.random() * 80,
+      size: 10 + Math.random() * 15,
+      life: 1.2 + Math.random() * 1.2,
+      rotation: Math.random() * Math.PI,
+      spin: (Math.random() - .5) * 3,
+      spriteIndex: spriteOffset + Math.floor(Math.random() * paletteLength)
+    });
+  }
+
+  function spawnTransitionHeart(floodTime) {
+    const fromSide = floodTime > 0.75 && Math.random() < 0.38;
+    const side = Math.random() < .5 ? -1 : 1;
+
+    let x;
+    let y;
+    let vx;
+    let vy;
+
+    if (fromSide) {
+      x = side < 0 ? -50 : W + 50;
+      y = Math.random() * H;
+      vx = side < 0
+        ? 150 + Math.random() * 250
+        : -150 - Math.random() * 250;
+      vy = -35 - Math.random() * 115;
+    } else {
+      x = Math.random() * W;
+      y = H + 45 + Math.random() * 90;
+      vx = (Math.random() - .5) * 170;
+      vy = -180 - Math.random() * 340;
+    }
+
+    const paletteLength = dayProgress > .7 ? 5 : 4;
+    const spriteOffset = dayProgress > .7 ? 4 : 0;
+
+    transitionHearts.push({
+      x,
+      y,
+      vx,
+      vy,
+      size: 14 + Math.random() * 42,
+      scale: .72 + Math.random() * .72,
+      growth: .08 + Math.random() * .24,
+      life: 2.4 + Math.random() * 1.7,
+      rotation: Math.random() * Math.PI * 2,
+      spin: (Math.random() - .5) * 3,
+      spriteIndex: spriteOffset + Math.floor(Math.random() * paletteLength),
+      alpha: .56 + Math.random() * .42
+    });
+  }
+
+
+  function spawnTransitionBurst(cx, cy, count, minSpeed, maxSpeed) {
+    const available = Math.max(0, 480 - transitionHearts.length);
+    const actualCount = Math.min(count, available);
+    const paletteLength = dayProgress > .7 ? 5 : 4;
+    const spriteOffset = dayProgress > .7 ? 4 : 0;
+
+    for (let i = 0; i < actualCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+
+      transitionHearts.push({
+        x: cx + (Math.random() - .5) * 18,
+        y: cy + (Math.random() - .5) * 18,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 28,
+        size: 11 + Math.random() * 28,
+        scale: .74 + Math.random() * .65,
+        growth: .05 + Math.random() * .18,
+        life: 2.0 + Math.random() * 1.45,
+        rotation: Math.random() * Math.PI * 2,
+        spin: (Math.random() - .5) * 3.7,
+        spriteIndex: spriteOffset + Math.floor(Math.random() * paletteLength),
+        alpha: .58 + Math.random() * .38
+      });
+    }
+  }
+
+  function spawnHeartRing(cx, cy, count, speed) {
+    const available = Math.max(0, 480 - transitionHearts.length);
+    const actualCount = Math.min(count, available);
+    const paletteLength = dayProgress > .7 ? 5 : 4;
+    const spriteOffset = dayProgress > .7 ? 4 : 0;
+
+    for (let i = 0; i < actualCount; i++) {
+      const angle = (Math.PI * 2 * i) / actualCount +
+        (Math.random() - .5) * .055;
+      const ringSpeed = speed * (.82 + Math.random() * .34);
+
+      transitionHearts.push({
+        x: cx + Math.cos(angle) * 7,
+        y: cy + Math.sin(angle) * 7,
+        vx: Math.cos(angle) * ringSpeed,
+        vy: Math.sin(angle) * ringSpeed - 22,
+        size: 12 + Math.random() * 25,
+        scale: .78 + Math.random() * .5,
+        growth: .05 + Math.random() * .14,
+        life: 2.5 + Math.random() * 1.25,
+        rotation: angle,
+        spin: (Math.random() - .5) * 3.2,
+        spriteIndex: spriteOffset + Math.floor(Math.random() * paletteLength),
+        alpha: .64 + Math.random() * .32
+      });
+    }
+  }
+
+  function spawnSparkleBurst(cx, cy, count, minSpeed, maxSpeed) {
+    const available = Math.max(0, 150 - transitionSparkles.length);
+    const actualCount = Math.min(count, available);
+
+    for (let i = 0; i < actualCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+
+      transitionSparkles.push({
+        x: cx + (Math.random() - .5) * 14,
+        y: cy + (Math.random() - .5) * 14,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        gravity: 12 + Math.random() * 28,
+        size: 2.4 + Math.random() * 6.6,
+        life: 1.2 + Math.random() * 1.4,
+        rotation: Math.random() * Math.PI,
+        spin: (Math.random() - .5) * 5,
+        color: (
+          dayProgress > .7
+            ? ["#ff7897", "#f39ab1", "#e48cae", "#f2ad8d", "#d982a4"]
+            : ["#ff65aa", "#e27bbc", "#c987d2", "#f096be", "#b786d4"]
+        )[Math.floor(Math.random() * 5)]
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    if (state === "title") {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, W, H);
+      drawTitleScreen();
+      return;
+    }
+
+    const shakeX = wrongShake > 0 ? (Math.random() - .5) * wrongShake : 0;
+    const shakeY = wrongShake > 0 ? (Math.random() - .5) * wrongShake * .45 : 0;
+
+    ctx.save();
+    ctx.translate(shakeX, shakeY);
+
+    drawSky(dayProgress);
+    drawBackgroundHearts(dayProgress);
+    drawWorld(dayProgress);
+
+    ctx.restore();
+
+    if (state === "heartFlood" || transitionHearts.length > 0) {
+      drawTransitionHearts();
+      drawTransitionSparkles();
+    }
+
+    if (sunriseFlash > 0) {
+      const bloom = smoothstep(clamp(sunriseFlash, 0, 1));
+      const sunRise = smootherstep(dayProgress);
+      const bloomX = lerp(W * .72, W * .78, sunRise);
+      const bloomY = lerp(H * .96, H * .17, sunRise);
+
+      const flashGradient = ctx.createRadialGradient(
+        bloomX,
+        bloomY,
+        0,
+        bloomX,
+        bloomY,
+        Math.max(W, H) * .82
+      );
+      flashGradient.addColorStop(
+        0,
+        `rgba(255,255,255,${bloom * .70})`
+      );
+      flashGradient.addColorStop(
+        .34,
+        `rgba(255,252,247,${bloom * .38})`
+      );
+      flashGradient.addColorStop(
+        .72,
+        `rgba(255,244,235,${bloom * .13})`
+      );
+      flashGradient.addColorStop(
+        1,
+        "rgba(255,255,255,0)"
+      );
+      ctx.fillStyle = flashGradient;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    if (transitionWash > 0) {
+      const wash = ctx.createRadialGradient(
+        W * .5, H * .55, 10,
+        W * .5, H * .55, Math.max(W, H) * .72
+      );
+      wash.addColorStop(0, `rgba(255, 236, 244, ${transitionWash * .96})`);
+      wash.addColorStop(.62, `rgba(255, 169, 199, ${transitionWash * .88})`);
+      wash.addColorStop(1, `rgba(239, 111, 163, ${transitionWash * .82})`);
+      ctx.fillStyle = wash;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    if (introBlack > 0) {
+      ctx.fillStyle = `rgba(0,0,0,${introBlack})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function drawTitleScreen() {
+    const t = stateTime;
+
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const firstAlpha = fadeWindow(t, 1.40, 2.00, 3.50, 4.25);
+    const secondAlpha = fadeWindow(t, 4.50, 5.10, 7.30, 8.10);
+    const titleAlpha = fadeWindow(t, 9.00, 10.30, 12.40, 13.30);
+
+    if (firstAlpha > 0) {
+      ctx.globalAlpha = firstAlpha;
+      ctx.fillStyle = "#f2dce8";
+      ctx.font =
+        `400 ${Math.min(34, W * .068)}px ` +
+        `"Love Ya Like A Sister", cursive`;
+      ctx.fillText(
+        "No matter how far apart...",
+        W / 2,
+        H / 2
+      );
+    }
+
+    if (secondAlpha > 0) {
+      ctx.globalAlpha = secondAlpha;
+      ctx.fillStyle = "#f6e8ef";
+      ctx.font =
+        `400 ${Math.min(34, W * .068)}px ` +
+        `"Love Ya Like A Sister", cursive`;
+      ctx.fillText(
+        "Every step still brings us closer.",
+        W / 2,
+        H / 2
+      );
+    }
+
+    if (titleAlpha > 0) {
+      const centerX = W / 2;
+      const centerY = H / 2;
+      const pulse =
+        1 + Math.sin((t - 9) * 2.25) * .012 * titleAlpha;
+      const ornamentFloat =
+        Math.sin((t - 9) * 1.35) * 2.5 * titleAlpha;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.scale(pulse, pulse);
+
+      // Soft layered glow behind the entire title composition.
+      const glow = ctx.createRadialGradient(
+        0,
+        0,
+        0,
+        0,
+        0,
+        Math.min(W * .42, 390)
+      );
+      glow.addColorStop(
+        0,
+        `rgba(222, 90, 153, ${titleAlpha * .19})`
+      );
+      glow.addColorStop(
+        .48,
+        `rgba(150, 57, 119, ${titleAlpha * .10})`
+      );
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.globalAlpha = titleAlpha;
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.ellipse(
+        0,
+        4,
+        Math.min(W * .42, 390),
+        Math.min(H * .25, 190),
+        0,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      // Fit the script title cleanly within the screen.
+      let titleSize = Math.min(88, Math.max(50, W * .105));
+      ctx.font = `400 ${titleSize}px "Love Light", cursive`;
+      const maxTitleWidth = Math.min(W - 56, 720);
+
+      while (
+        ctx.measureText(CONFIG.title).width > maxTitleWidth &&
+        titleSize > 42
+      ) {
+        titleSize -= 2;
+        ctx.font =
+          `400 ${titleSize}px "Love Light", cursive`;
+      }
+
+      const measuredTitle =
+        ctx.measureText(CONFIG.title).width;
+      const ornamentWidth =
+        Math.min(
+          Math.max(measuredTitle * .58, 190),
+          maxTitleWidth * .66
+        );
+
+      // Fine ornamental rules above and below.
+      ctx.globalAlpha = titleAlpha * .70;
+      ctx.strokeStyle = "rgba(255, 180, 214, .72)";
+      ctx.lineWidth = 1.05;
+      ctx.shadowColor = "rgba(255, 96, 171, .28)";
+      ctx.shadowBlur = 8;
+
+      [-1, 1].forEach(direction => {
+        ctx.beginPath();
+        ctx.moveTo(
+          direction * 27,
+          -titleSize * .63 + ornamentFloat
+        );
+        ctx.bezierCurveTo(
+          direction * ornamentWidth * .22,
+          -titleSize * .76 + ornamentFloat,
+          direction * ornamentWidth * .72,
+          -titleSize * .57 + ornamentFloat,
+          direction * ornamentWidth,
+          -titleSize * .68 + ornamentFloat
+        );
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(
+          direction * 34,
+          titleSize * .57 - ornamentFloat
+        );
+        ctx.bezierCurveTo(
+          direction * ornamentWidth * .28,
+          titleSize * .72 - ornamentFloat,
+          direction * ornamentWidth * .70,
+          titleSize * .49 - ornamentFloat,
+          direction * ornamentWidth,
+          titleSize * .62 - ornamentFloat
+        );
+        ctx.stroke();
+      });
+
+      // Small decorative hearts at both sides.
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = "rgba(255, 153, 201, .92)";
+      ctx.font =
+        `400 ${Math.max(18, titleSize * .25)}px ` +
+        `"Love Ya Like A Sister", cursive`;
+      ctx.globalAlpha = titleAlpha * .90;
+      ctx.fillText(
+        "♡",
+        -ornamentWidth - 18,
+        -titleSize * .03 + ornamentFloat
+      );
+      ctx.fillText(
+        "♡",
+        ornamentWidth + 18,
+        -titleSize * .03 - ornamentFloat
+      );
+
+      // Sparkles and tiny hearts build a richer frame without clutter.
+      const accents = [
+        [-ornamentWidth * .72, -titleSize * .95, "✦", .84],
+        [ornamentWidth * .74, -titleSize * .90, "✦", .72],
+        [-ornamentWidth * .90, titleSize * .86, "·", .66],
+        [ornamentWidth * .91, titleSize * .80, "·", .66],
+        [-ornamentWidth * .38, titleSize * .88, "♡", .62],
+        [ornamentWidth * .40, titleSize * .91, "♡", .62],
+        [0, -titleSize * 1.04, "✦", .78]
+      ];
+
+      accents.forEach((accent, index) => {
+        const [x, y, symbol, opacity] = accent;
+        const twinkle =
+          .76 +
+          Math.sin(t * 3.1 + index * 1.47) * .24;
+        ctx.globalAlpha =
+          titleAlpha * opacity * twinkle;
+        ctx.font =
+          `400 ${Math.max(12, titleSize * .16)}px ` +
+          `"Love Ya Like A Sister", cursive`;
+        ctx.fillText(
+          symbol,
+          x,
+          y + Math.sin(t * 1.45 + index) * 2
+        );
+      });
+
+      // Main title: smaller, better balanced, and more readable.
+      ctx.globalAlpha = titleAlpha;
+      ctx.fillStyle = "#fff8fc";
+      ctx.shadowColor = "rgba(255, 91, 169, .48)";
+      ctx.shadowBlur = 24 * titleAlpha;
+      ctx.font =
+        `400 ${titleSize}px "Love Light", cursive`;
+      ctx.fillText(CONFIG.title, 0, 0);
+
+      // Subtle warm inner highlight.
+      ctx.globalAlpha = titleAlpha * .32;
+      ctx.fillStyle = "#ffd8ea";
+      ctx.shadowBlur = 0;
+      ctx.fillText(CONFIG.title, 0, -1.2);
+
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+
+  function drawSky(day) {
+    const top = mixColor("#12091b", "#83c8e8", day);
+    const middle = mixColor("#3b1637", "#efbed0", day);
+    const bottom = mixColor("#a93472", "#f4d7b0", day);
+
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, top);
+    g.addColorStop(.58, middle);
+    g.addColorStop(1, bottom);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    drawSkyLayers(day);
+
+    if (day < 1) {
+      const moonSet = smootherstep(day);
+      const moonX = lerp(W * .80, W * .91, moonSet);
+      const moonY = lerp(H * .18, H * .92, moonSet);
+      const moonScale = lerp(1, .72, moonSet);
+
+      ctx.save();
+      ctx.globalAlpha = Math.pow(1 - day, 1.08);
+      ctx.translate(moonX, moonY);
+      ctx.scale(moonScale, moonScale);
+      drawMoon(0, 0, Math.min(56, W * .09));
+      ctx.restore();
+    }
+
+    if (day > 0) {
+      const sunRise = smootherstep(day);
+      const sunX = lerp(W * .72, W * .78, sunRise);
+      const sunY = lerp(H * .96, H * .17, sunRise);
+      const sunScale = lerp(.70, 1, sunRise);
+
+      ctx.save();
+      ctx.globalAlpha = Math.pow(day, .90);
+      ctx.translate(sunX, sunY);
+      ctx.scale(sunScale, sunScale);
+      drawSun(0, 0, Math.min(58, W * .09));
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = day;
+      drawClouds(day);
+      drawBirds(day);
+      drawButterflies(day);
+      drawSkyWhimsy(day);
+      ctx.restore();
+    }
+
+    const starAlpha = Math.pow(1 - day, 1.7);
+    drawShootingStars(starAlpha);
+
+    if (starAlpha > 0.01) {
+      for (let i = 0; i < 88; i++) {
+        const sx = ((i * 173 + i * i * 7 + 47) % (W + 180)) - 90;
+        const sy =
+          22 +
+          ((i * 89 + i * i * 3 + 33) % Math.max(150, H * .55));
+        const twinkle =
+          .38 + Math.sin(performance.now() / (620 + i * 3) + i) * .30;
+        ctx.globalAlpha = twinkle * starAlpha;
+        ctx.fillStyle =
+          i % 11 === 0 ? "#ffd1e7" :
+          i % 7 === 0 ? "#e7d9ff" :
+          "#fff8fc";
+        ctx.beginPath();
+        ctx.arc(sx, sy, i % 13 === 0 ? 2 : i % 5 === 0 ? 1.3 : .85, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  function drawSkyLayers(day) {
+    const night = 1 - day;
+    const time = performance.now() * .00008;
+
+    // Soft aurora ribbons at night.
+    if (night > .02) {
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      ctx.globalAlpha = night * .075;
+
+      const ribbons = [
+        { y: .24, amp: 14, width: 34, a: "#a76ab6", b: "#df7eae", phase: 0 },
+        { y: .39, amp: 10, width: 24, a: "#73589e", b: "#c982aa", phase: 3.1 }
+      ];
+
+      ribbons.forEach((ribbon, index) => {
+        const gradient = ctx.createLinearGradient(0, 0, W, 0);
+        gradient.addColorStop(0, "rgba(255,255,255,0)");
+        gradient.addColorStop(.22, ribbon.a);
+        gradient.addColorStop(.62, ribbon.b);
+        gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = ribbon.width;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+
+        for (let x = -80; x <= W + 80; x += 35) {
+          const y =
+            H * ribbon.y +
+            Math.sin(x * .006 + time * (8 + index * 2) + ribbon.phase) *
+              ribbon.amp;
+          if (x === -80) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      });
+
+      ctx.restore();
+
+      // Three quiet constellations make the upper sky feel intentional.
+      const constellations = [
+        // Simple heart constellation on the left.
+        [
+          [.112, .158],
+          [.132, .126],
+          [.157, .130],
+          [.166, .150],
+          [.175, .130],
+          [.200, .126],
+          [.220, .158],
+          [.207, .204],
+          [.166, .257],
+          [.125, .204],
+          [.112, .158]
+        ],
+        // Small upper-middle constellation, comfortably left of the moon.
+        [[.48, .105], [.515, .145], [.555, .115], [.595, .158], [.635, .128]],
+        // Lower-center constellation, separated from the heart.
+        [[.34, .325], [.375, .285], [.415, .322], [.455, .282], [.485, .315]]
+      ];
+
+      ctx.save();
+      ctx.globalAlpha = night * .29;
+      ctx.strokeStyle = "#f3cfe2";
+      ctx.fillStyle = "#fff3fa";
+      ctx.lineWidth = 1;
+
+      constellations.forEach((points, constellationIndex) => {
+        ctx.save();
+
+        if (constellationIndex === 0) {
+          ctx.strokeStyle = "#ffd4e8";
+          ctx.fillStyle = "#fff4fa";
+          ctx.lineWidth = 1.25;
+          ctx.shadowColor = "rgba(255, 163, 207, .38)";
+          ctx.shadowBlur = 6;
+        }
+
+        ctx.beginPath();
+        points.forEach(([px, py], index) => {
+          const x = W * px;
+          const y = H * py;
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        points.forEach(([px, py], index) => {
+          if (constellationIndex === 0 && index === points.length - 1) {
+            return;
+          }
+
+          ctx.beginPath();
+          const radius = constellationIndex === 0
+            ? (index === 8 ? 2.3 : 1.85)
+            : (index % 2 ? 1.7 : 2.2);
+          ctx.arc(W * px, H * py, radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.restore();
+      });
+      ctx.restore();
+    }
+
+    // Daytime sunbeams and long, thin cloud streaks.
+    if (day > .02) {
+      ctx.save();
+      ctx.globalAlpha = smoothstep((day - .18) / .82) * .16;
+
+      const sunRise = smootherstep(day);
+      const sunX = lerp(W * .72, W * .78, sunRise);
+      const sunY = lerp(H * .96, H * .17, sunRise);
+      const rayGradient = ctx.createRadialGradient(
+        sunX,
+        sunY,
+        4,
+        sunX,
+        sunY,
+        Math.max(W, H) * .72
+      );
+      rayGradient.addColorStop(0, "rgba(255,249,210,.76)");
+      rayGradient.addColorStop(.38, "rgba(255,244,211,.25)");
+      rayGradient.addColorStop(1, "rgba(255,241,218,0)");
+      ctx.fillStyle = rayGradient;
+
+      const rayTargets = [
+        [.12, .73, .25, .73],
+        [.30, .76, .41, .76],
+        [.48, .78, .57, .78],
+        [.64, .79, .72, .79],
+        [.80, .80, .87, .80]
+      ];
+
+      rayTargets.forEach(([leftX, leftY, rightX, rightY]) => {
+        ctx.beginPath();
+        ctx.moveTo(sunX, sunY);
+        ctx.lineTo(W * leftX, H * leftY);
+        ctx.lineTo(W * rightX, H * rightY);
+        ctx.closePath();
+        ctx.fill();
+      });
+
+      ctx.globalAlpha = day * .24;
+      ctx.strokeStyle = "#fff8f5";
+      ctx.lineCap = "round";
+
+      const wisps = [
+        { x: .26, y: .13, width: 17, sway: 52, speed: .34, phase: .3 },
+        { x: .42, y: .27, width: 12, sway: 44, speed: .27, phase: 2.1 },
+        { x: .20, y: .41, width: 9, sway: 38, speed: .22, phase: 4.2 }
+      ];
+
+      wisps.forEach((wisp, index) => {
+        const centerX =
+          W * wisp.x +
+          Math.sin(performance.now() * .001 * wisp.speed + wisp.phase) *
+            wisp.sway;
+
+        ctx.lineWidth = wisp.width;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 150, H * wisp.y);
+        ctx.bezierCurveTo(
+          centerX - 58,
+          H * wisp.y - 10 - index * 3,
+          centerX + 48,
+          H * wisp.y + 11,
+          centerX + 155,
+          H * wisp.y - 2
+        );
+        ctx.stroke();
+      });
+
+      ctx.restore();
+    }
+  }
+
+  function drawSun(x, y, r) {
+    const glow = ctx.createRadialGradient(x, y, r * .1, x, y, r * 2.1);
+    glow.addColorStop(0, "rgba(255,252,214,.98)");
+    glow.addColorStop(.38, "rgba(255,220,142,.58)");
+    glow.addColorStop(1, "rgba(255,203,112,0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 2.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#ffe2a1";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawShootingStars(alpha) {
+    if (alpha <= .02) return;
+
+    const t = performance.now() * .00012;
+    const stars = [
+      { phase: .08, y: .18, length: 62, speed: .72 },
+      { phase: .52, y: .31, length: 44, speed: .54 }
+    ];
+
+    ctx.save();
+    ctx.lineCap = "round";
+
+    stars.forEach((star, index) => {
+      const cycle = (t * star.speed + star.phase) % 1;
+      const x = W * (1.18 - cycle * 1.48);
+      const y = H * star.y + cycle * H * .12;
+      const tailX = x + star.length;
+      const tailY = y - star.length * .42;
+
+      const gradient = ctx.createLinearGradient(x, y, tailX, tailY);
+      gradient.addColorStop(0, `rgba(255,246,252,${alpha * .9})`);
+      gradient.addColorStop(1, "rgba(255,190,224,0)");
+
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = index === 0 ? 2 : 1.4;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(tailX, tailY);
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(255,250,253,${alpha})`;
+      ctx.beginPath();
+      ctx.arc(x, y, index === 0 ? 2.3 : 1.7, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  function drawSkyWhimsy(day) {
+    if (day <= .10) return;
+
+    const time = performance.now() * .001;
+    const visibility = smoothstep((day - .10) / .90);
+
+    ctx.save();
+    ctx.globalAlpha = visibility * .72;
+
+    // A few extra tiny birds at different depths.
+    const extraBirds = [
+      { x: .13, y: .22, scale: .30, phase: .2 },
+      { x: .39, y: .18, scale: .24, phase: 2.3 },
+      { x: .62, y: .34, scale: .27, phase: 4.1 },
+      { x: .88, y: .24, scale: .22, phase: 5.4 }
+    ];
+
+    extraBirds.forEach((bird, index) => {
+      const travel =
+        ((time * (7 + index * 1.1) +
+          W * bird.x +
+          index * 180) % (W + 180)) - 90;
+      const y =
+        H * bird.y +
+        Math.sin(time * .75 + bird.phase) * 5;
+      const flap =
+        Math.sin(time * 4.2 + bird.phase) *
+        2.4 *
+        bird.scale;
+
+      ctx.save();
+      ctx.translate(travel, y);
+      ctx.scale(bird.scale, bird.scale);
+      ctx.strokeStyle = mixColor("#725069", "#8c6570", day);
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(-9, -8 - flap, -19, -1);
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(9, -8 - flap, 19, -1);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // Extra butterflies closer to the hills.
+    for (let i = 0; i < 5; i++) {
+      const x =
+        ((time * (9 + i * 1.2) + i * 211 + 90) %
+          (W + 100)) - 50;
+      const y =
+        H * (.42 + (i % 3) * .065) +
+        Math.sin(time * (1.35 + i * .05) + i * 1.6) * 11;
+      const flap =
+        .42 + Math.abs(Math.sin(time * 5.8 + i * 1.3)) * .62;
+      const size = 3.1 + (i % 2) * .9;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.sin(time * .85 + i) * .16);
+      ctx.fillStyle =
+        i % 3 === 0
+          ? mixColor("#cf75a8", "#ef91aa", day)
+          : i % 3 === 1
+            ? mixColor("#a780bb", "#d3afe2", day)
+            : mixColor("#c79272", "#edc17e", day);
+
+      ctx.beginPath();
+      ctx.ellipse(
+        -size * .52,
+        0,
+        size * flap,
+        size * .52,
+        -.45,
+        0,
+        Math.PI * 2
+      );
+      ctx.ellipse(
+        size * .52,
+        0,
+        size * flap,
+        size * .52,
+        .45,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.fillStyle = mixColor("#663d5c", "#805064", day);
+      ctx.fillRect(-.55, -size * .52, 1.1, size * 1.04);
+      ctx.restore();
+    }
+
+    // Two tiny kites, drifting gently rather than crossing quickly.
+    const kites = [
+      {
+        x: .21,
+        y: .26,
+        size: 8.5,
+        phase: .4,
+        colorA: "#c875a5",
+        colorB: "#f0a0b4"
+      },
+      {
+        x: .73,
+        y: .38,
+        size: 7.2,
+        phase: 2.7,
+        colorA: "#9b7eb7",
+        colorB: "#d7b8e5"
+      }
+    ];
+
+    kites.forEach((kite, index) => {
+      const x =
+        W * kite.x +
+        Math.sin(time * .24 + kite.phase) * (15 + index * 4);
+      const y =
+        H * kite.y +
+        Math.sin(time * .31 + kite.phase) * 8;
+      const size = kite.size;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.sin(time * .34 + kite.phase) * .10);
+
+      ctx.fillStyle = mixColor(kite.colorA, kite.colorB, day);
+      ctx.beginPath();
+      ctx.moveTo(0, -size);
+      ctx.lineTo(size * .72, 0);
+      ctx.lineTo(0, size);
+      ctx.lineTo(-size * .72, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = mixColor("#71506c", "#9a6a75", day);
+      ctx.lineWidth = .9;
+      ctx.beginPath();
+      ctx.moveTo(0, -size);
+      ctx.lineTo(0, size);
+      ctx.moveTo(-size * .72, 0);
+      ctx.lineTo(size * .72, 0);
+      ctx.stroke();
+
+      ctx.strokeStyle = mixColor("#85617a", "#b17c85", day);
+      ctx.lineWidth = .85;
+      ctx.beginPath();
+      ctx.moveTo(0, size);
+      ctx.bezierCurveTo(
+        -4,
+        size + 9,
+        6,
+        size + 16,
+        -2,
+        size + 25
+      );
+      ctx.stroke();
+
+      ctx.fillStyle = mixColor("#c978a2", "#eda0aa", day);
+      [-1, 1].forEach((direction, bowIndex) => {
+        ctx.save();
+        ctx.translate(
+          direction * 2.5,
+          size + 12 + bowIndex * 7
+        );
+        ctx.rotate(direction * .55);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(direction * 3.3, -2);
+        ctx.lineTo(direction * 3.3, 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      });
+
+      ctx.restore();
+    });
+
+    // Three small pastel balloons with trailing strings.
+    const balloons = [
+      { x: .10, y: .39, phase: .8, color: "#e68bac", scale: .82 },
+      { x: .53, y: .23, phase: 3.1, color: "#d5a1d9", scale: .72 },
+      { x: .91, y: .47, phase: 5.2, color: "#e9b58e", scale: .68 }
+    ];
+
+    balloons.forEach((balloon, index) => {
+      const drift =
+        ((time * (2.2 + index * .35) +
+          W * balloon.x +
+          index * 230) % (W + 100)) - 50;
+      const y =
+        H * balloon.y +
+        Math.sin(time * .48 + balloon.phase) * 10;
+
+      ctx.save();
+      ctx.translate(drift, y);
+      ctx.scale(balloon.scale, balloon.scale);
+
+      ctx.fillStyle = balloon.color;
+      ctx.globalAlpha = visibility * .72;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 7, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = visibility * .28;
+      ctx.fillStyle = "#fff8fb";
+      ctx.beginPath();
+      ctx.ellipse(-2.2, -3, 1.5, 2.7, -.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = visibility * .65;
+      ctx.fillStyle = mixColor("#7e526d", "#a66f7e", day);
+      ctx.beginPath();
+      ctx.moveTo(-2, 8);
+      ctx.lineTo(2, 8);
+      ctx.lineTo(0, 11);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = mixColor("#74506c", "#a2767d", day);
+      ctx.lineWidth = .75;
+      ctx.beginPath();
+      ctx.moveTo(0, 11);
+      ctx.bezierCurveTo(-3, 18, 4, 23, 0, 31);
+      ctx.stroke();
+
+      ctx.restore();
+    });
+
+    ctx.restore();
+  }
+
+
+  function drawBirds(day) {
+    if (day <= .12) return;
+
+    const time = performance.now() * .001;
+    const flocks = [
+      {
+        y: .14,
+        speed: 7.2,
+        offset: 70,
+        birds: [
+          { dx: 0, dy: 0, scale: .48 },
+          { dx: 68, dy: 13, scale: .42 },
+          { dx: 143, dy: -5, scale: .37 }
+        ]
+      },
+      {
+        y: .29,
+        speed: 4.8,
+        offset: 520,
+        birds: [
+          { dx: 0, dy: 0, scale: .34 },
+          { dx: 92, dy: -14, scale: .29 }
+        ]
+      }
+    ];
+
+    function drawDistantBird(x, y, scale, flapPhase) {
+      const flap = Math.sin(time * 3.1 + flapPhase) * 2.2 * scale;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.strokeStyle = "#76536a";
+      ctx.fillStyle = "#76536a";
+      ctx.lineWidth = 2.1;
+      ctx.lineCap = "round";
+
+      // Tiny body.
+      ctx.beginPath();
+      ctx.ellipse(0, 1, 4, 1.7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Curved wings, separated by the body.
+      ctx.beginPath();
+      ctx.moveTo(-1.5, 0);
+      ctx.quadraticCurveTo(-10, -9 - flap, -20, -2 + flap * .2);
+      ctx.moveTo(1.5, 0);
+      ctx.quadraticCurveTo(10, -9 - flap, 20, -2 + flap * .2);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.globalAlpha = day * .42;
+
+    flocks.forEach((flock, flockIndex) => {
+      const travel =
+        ((time * flock.speed + flock.offset) % (W + 460)) - 230;
+      const baseY = H * flock.y;
+
+      flock.birds.forEach((bird, index) => {
+        drawDistantBird(
+          travel + bird.dx,
+          baseY + bird.dy + Math.sin(time * .7 + index) * 2,
+          bird.scale,
+          flockIndex * 2 + index
+        );
+      });
+    });
+
+    ctx.restore();
+  }
+
+  function drawButterflies(day) {
+    if (day <= .08) return;
+
+    const time = performance.now() * .001;
+    ctx.save();
+    ctx.globalAlpha = day * .55;
+
+    for (let i = 0; i < 7; i++) {
+      const x =
+        ((time * (12 + i * 1.7) + i * 173) % (W + 120)) - 60;
+      const y =
+        H * (.34 + (i % 3) * .08) +
+        Math.sin(time * (1.2 + i * .07) + i) * 14;
+      const flap = .45 + Math.abs(Math.sin(time * 5.4 + i)) * .7;
+      const size = 3.8 + (i % 3) * 1.2;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.sin(time * .8 + i) * .18);
+      ctx.fillStyle = i % 2 === 0 ? "#f58eae" : "#ffd08f";
+
+      ctx.beginPath();
+      ctx.ellipse(-size * .55, 0, size * flap, size * .55, -.45, 0, Math.PI * 2);
+      ctx.ellipse(size * .55, 0, size * flap, size * .55, .45, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#8b4b68";
+      ctx.fillRect(-.7, -size * .55, 1.4, size * 1.1);
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  function drawClouds(day) {
+    if (day <= .02) return;
+
+    const time = performance.now() * .001;
+    const cloudSets = [
+      {
+        x: .05,
+        y: .17,
+        scale: 1.08,
+        stretch: 1.28,
+        drift: 11,
+        speed: .11,
+        phase: .4,
+        blush: .30
+      },
+      {
+        x: .28,
+        y: .31,
+        scale: .88,
+        stretch: 1.34,
+        drift: 15,
+        speed: .095,
+        phase: 1.8,
+        blush: .23
+      },
+      {
+        x: .49,
+        y: .14,
+        scale: .74,
+        stretch: 1.30,
+        drift: 11,
+        speed: .082,
+        phase: 3.2,
+        blush: .20
+      },
+      {
+        x: .71,
+        y: .28,
+        scale: .69,
+        stretch: 1.38,
+        drift: 10,
+        speed: .074,
+        phase: 4.5,
+        blush: .18
+      },
+      {
+        x: .91,
+        y: .39,
+        scale: .59,
+        stretch: 1.32,
+        drift: 8,
+        speed: .066,
+        phase: 5.7,
+        blush: .16
+      }
+    ];
+
+    function drawLayeredCloud(cloud, cloudIndex) {
+      const sway =
+        Math.sin(time * cloud.speed + cloud.phase) * cloud.drift;
+      const bob =
+        Math.sin(time * cloud.speed * .72 + cloud.phase * 1.3) * 2.2;
+
+      ctx.save();
+      ctx.translate(W * cloud.x + sway, H * cloud.y + bob);
+      ctx.scale(cloud.scale * cloud.stretch, cloud.scale);
+
+      // Diffused shadow under the cloud.
+      ctx.globalAlpha = day * .17;
+      ctx.fillStyle = mixColor("#b97ea5", "#d798aa", day);
+      ctx.beginPath();
+      ctx.ellipse(2, 25, 66, 16, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Blush underside gives the clouds depth and keeps them in palette.
+      const underside = ctx.createLinearGradient(0, -4, 0, 31);
+      underside.addColorStop(
+        0,
+        `rgba(255, 236, 244, ${day * .12})`
+      );
+      underside.addColorStop(
+        .58,
+        `rgba(236, 166, 192, ${day * cloud.blush})`
+      );
+      underside.addColorStop(
+        1,
+        `rgba(208, 132, 166, ${day * cloud.blush * .78})`
+      );
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = underside;
+      ctx.beginPath();
+      ctx.arc(-40, 7, 23, 0, Math.PI * 2);
+      ctx.arc(-15, -7, 31, 0, Math.PI * 2);
+      ctx.arc(18, -12, 36, 0, Math.PI * 2);
+      ctx.arc(48, 4, 25, 0, Math.PI * 2);
+      roundRect(ctx, -68, 5, 136, 29, 14);
+      ctx.fill();
+
+      // Cream-white upper puffs.
+      const topLight = ctx.createLinearGradient(0, -42, 0, 20);
+      topLight.addColorStop(
+        0,
+        `rgba(255, 252, 248, ${day * .88})`
+      );
+      topLight.addColorStop(
+        .58,
+        `rgba(255, 243, 244, ${day * .76})`
+      );
+      topLight.addColorStop(
+        1,
+        `rgba(244, 207, 220, ${day * .42})`
+      );
+      ctx.fillStyle = topLight;
+
+      [
+        [-42, 2, 19],
+        [-20, -11, 27],
+        [8, -17, 32],
+        [35, -7, 25],
+        [52, 7, 17]
+      ].forEach(([x, y, r]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Soft highlight along the cloud's top edge.
+      ctx.globalAlpha = day * .36;
+      ctx.strokeStyle = "#fffdf9";
+      ctx.lineWidth = 2.1;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(-42, -5);
+      ctx.quadraticCurveTo(-20, -30, 3, -32);
+      ctx.quadraticCurveTo(29, -29, 44, -9);
+      ctx.stroke();
+
+      // A few subtle hanging wisps on the larger left clouds.
+      if (cloudIndex < 2) {
+        ctx.globalAlpha = day * .19;
+        ctx.strokeStyle = mixColor("#f3cadc", "#f2d4d0", day);
+        ctx.lineWidth = 4.5;
+        ctx.lineCap = "round";
+
+        [-28, 5, 35].forEach((x, wispIndex) => {
+          ctx.beginPath();
+          ctx.moveTo(x, 24);
+          ctx.bezierCurveTo(
+            x - 6,
+            31 + wispIndex * 2,
+            x + 5,
+            37 + wispIndex,
+            x - 2,
+            44 + wispIndex * 2
+          );
+          ctx.stroke();
+        });
+      }
+
+      // Tiny pearly glints keep the clouds whimsical without clutter.
+      if (cloudIndex !== 3) {
+        ctx.globalAlpha = day * .34;
+        ctx.fillStyle = cloudIndex % 2 === 0 ? "#ffe0ee" : "#fff0d7";
+
+        [
+          [-59, -5, 1.8],
+          [57, -11, 1.4],
+          [21, -42, 1.6]
+        ].forEach(([x, y, size], glintIndex) => {
+          const pulse =
+            .7 + Math.sin(time * 1.7 + cloudIndex + glintIndex) * .25;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillRect(
+            -size * pulse,
+            -size * pulse,
+            size * 2 * pulse,
+            size * 2 * pulse
+          );
+          ctx.restore();
+        });
+      }
+
+      ctx.restore();
+    }
+
+    cloudSets.forEach(drawLayeredCloud);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawMoon(x, y, r) {
+    const g = ctx.createRadialGradient(x, y, r * .1, x, y, r * 1.8);
+    g.addColorStop(0, "rgba(255,244,250,.95)");
+    g.addColorStop(.35, "rgba(255,218,238,.55)");
+    g.addColorStop(1, "rgba(255,150,200,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#fff0f7";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawWorld(day) {
+    const waterY = H * waterYRatio;
+
+    drawFarShore(waterY, day);
+
+    ctx.save();
+    ctx.translate(-cameraX, 0);
+
+    drawWater(waterY, day);
+
+    // Only render platforms near the camera. Drawing all 100 detailed
+    // stones every frame was the largest source of slowdown.
+    const platformPadding = 300;
+    const firstVisiblePlatform = clamp(
+      Math.floor(
+        (cameraX - platformPadding - 160) / platformSpacing
+      ),
+      0,
+      platforms.length - 1
+    );
+    const lastVisiblePlatform = clamp(
+      Math.ceil(
+        (cameraX + W + platformPadding - 160) / platformSpacing
+      ),
+      0,
+      platforms.length - 1
+    );
+
+    for (
+      let i = firstVisiblePlatform;
+      i <= lastVisiblePlatform;
+      i++
+    ) {
+      drawPlatform(i, platformY(i), day);
+    }
+
+    if (
+      state === "play" &&
+      player.platform < platforms.length - 1
+    ) {
+      const promptIndex = player.platform + 1;
+      const showingSuccessEffect =
+        correctKeyFeedback &&
+        correctKeyFeedback.index === promptIndex;
+
+      if (!player.jumping || showingSuccessEffect) {
+        drawKeyPrompt(
+          promptIndex,
+          platformY(promptIndex),
+          day
+        );
+      }
+    }
+
+    player.y = player.jumping ? player.y : platformY(player.platform);
+    partner.y = platformY(platforms.length - 1);
+
+    const herShirt = mixColor("#ff8fc4", "#ff9fbd", day);
+    const herHair = mixColor("#6c315c", "#7d4365", day);
+    const yourShirt = mixColor("#9ec5ff", "#8ecff3", day);
+    const yourHair = mixColor("#25486e", "#315f7a", day);
+
+    drawCharacter(partner.x, partner.y, CONFIG.yourName, yourShirt, yourHair, partner.facing, false, day);
+    drawCharacter(player.x, player.y, CONFIG.herName, herShirt, herHair, player.facing, true, day);
+    drawReunionHeart(day);
+
+    heartParticles.forEach(particle => drawHeartParticle(particle, day));
+
+    ctx.restore();
+  }
+
+  function drawFarShore(waterY, day) {
+    const time = performance.now() * .001;
+    const night = 1 - day;
+
+    // Far mist band.
+    const mist = ctx.createLinearGradient(
+      0,
+      waterY - 175,
+      0,
+      waterY + 5
+    );
+    mist.addColorStop(
+      0,
+      `rgba(255, 222, 239, ${lerp(.03, .19, day)})`
+    );
+    mist.addColorStop(
+      1,
+      "rgba(255, 222, 239, 0)"
+    );
+    ctx.fillStyle = mist;
+    ctx.fillRect(0, waterY - 185, W, 195);
+
+    // Back hills.
+    const backHillGradient = ctx.createLinearGradient(
+      0,
+      waterY - 170,
+      0,
+      waterY
+    );
+    backHillGradient.addColorStop(
+      0,
+      mixColor("#3c1d4b", "#c59bb5", day)
+    );
+    backHillGradient.addColorStop(
+      1,
+      mixColor("#5d2856", "#d6a6b4", day)
+    );
+    ctx.fillStyle = backHillGradient;
+    ctx.globalAlpha = lerp(.72, .62, day);
+    ctx.beginPath();
+    ctx.moveTo(0, waterY);
+    ctx.lineTo(0, waterY - 89);
+    ctx.bezierCurveTo(
+      W * .09,
+      waterY - 172,
+      W * .19,
+      waterY - 119,
+      W * .27,
+      waterY - 82
+    );
+    ctx.bezierCurveTo(
+      W * .38,
+      waterY - 171,
+      W * .50,
+      waterY - 154,
+      W * .58,
+      waterY - 89
+    );
+    ctx.bezierCurveTo(
+      W * .70,
+      waterY - 172,
+      W * .82,
+      waterY - 138,
+      W,
+      waterY - 83
+    );
+    ctx.lineTo(W, waterY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Smaller flowers scattered over the distant hills.
+    drawHillFlowerFields(waterY, day, time, "back");
+
+    // Midground rolling hills.
+    const midHillGradient = ctx.createLinearGradient(
+      0,
+      waterY - 125,
+      0,
+      waterY
+    );
+    midHillGradient.addColorStop(
+      0,
+      mixColor("#54264f", "#c77f9f", day)
+    );
+    midHillGradient.addColorStop(
+      .56,
+      mixColor("#71305e", "#d992a8", day)
+    );
+    midHillGradient.addColorStop(
+      1,
+      mixColor("#4b2047", "#b66d91", day)
+    );
+    ctx.globalAlpha = lerp(.82, .76, day);
+    ctx.fillStyle = midHillGradient;
+    ctx.beginPath();
+    ctx.moveTo(0, waterY);
+    ctx.lineTo(0, waterY - 52);
+    ctx.bezierCurveTo(
+      W * .12,
+      waterY - 104,
+      W * .25,
+      waterY - 89,
+      W * .34,
+      waterY - 44
+    );
+    ctx.bezierCurveTo(
+      W * .48,
+      waterY - 121,
+      W * .62,
+      waterY - 109,
+      W * .72,
+      waterY - 45
+    );
+    ctx.bezierCurveTo(
+      W * .84,
+      waterY - 101,
+      W * .92,
+      waterY - 84,
+      W,
+      waterY - 49
+    );
+    ctx.lineTo(W, waterY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Highlighted hill ridges.
+    ctx.globalAlpha = lerp(.13, .29, day);
+    ctx.strokeStyle = mixColor("#b66f9d", "#f0b4bd", day);
+    ctx.lineWidth = 2.1;
+    ctx.beginPath();
+    ctx.moveTo(W * .02, waterY - 48);
+    ctx.bezierCurveTo(
+      W * .14,
+      waterY - 101,
+      W * .25,
+      waterY - 75,
+      W * .34,
+      waterY - 40
+    );
+    ctx.moveTo(W * .48, waterY - 83);
+    ctx.bezierCurveTo(
+      W * .58,
+      waterY - 105,
+      W * .68,
+      waterY - 82,
+      W * .74,
+      waterY - 49
+    );
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    drawHillFlowerFields(waterY, day, time, "front");
+
+    // Cute volcano positioned center-left to balance the sun.
+    drawCuteVolcano(W * .245, waterY - 4, 1.17, day, time);
+
+    // Tiny bushes and flowering shrubs across the lower ridge.
+    const shrubs = [
+      [.05, 13, .72],
+      [.12, 10, .54],
+      [.46, 12, .70],
+      [.55, 9, .48],
+      [.66, 13, .62],
+      [.78, 10, .50],
+      [.90, 12, .66]
+    ];
+
+    shrubs.forEach(([xRatio, radius, scale], shrubIndex) => {
+      const x = W * xRatio;
+      const y =
+        waterY -
+        25 -
+        Math.sin(xRatio * 24) * 8 -
+        (shrubIndex % 2) * 4;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = mixColor("#4e3155", "#8ba082", day);
+      [-10, 0, 10].forEach((dx, leafIndex) => {
+        ctx.beginPath();
+        ctx.arc(dx, leafIndex === 1 ? -4 : 1, radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.globalAlpha = lerp(.18, .68, day);
+      ctx.fillStyle =
+        shrubIndex % 3 === 0 ? "#ffc1d6" :
+        shrubIndex % 3 === 1 ? "#ffe0a9" :
+        "#e5c2ef";
+
+      [-8, 4, 12].forEach((dx, flowerIndex) => {
+        ctx.beginPath();
+        ctx.arc(
+          dx,
+          -7 - (flowerIndex % 2) * 4,
+          2.2,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      });
+      ctx.restore();
+    });
+
+    // Small winding path on the right hill.
+    ctx.save();
+    ctx.globalAlpha = lerp(.10, .35, day);
+    ctx.strokeStyle = mixColor("#b77f9b", "#efd0ba", day);
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(W * .72, waterY - 45);
+    ctx.bezierCurveTo(
+      W * .77,
+      waterY - 59,
+      W * .82,
+      waterY - 44,
+      W * .87,
+      waterY - 62
+    );
+    ctx.bezierCurveTo(
+      W * .91,
+      waterY - 76,
+      W * .94,
+      waterY - 65,
+      W * .97,
+      waterY - 79
+    );
+    ctx.stroke();
+    ctx.restore();
+
+    // Occasional hill fireflies at night.
+    if (night > .05) {
+      ctx.save();
+      ctx.globalAlpha = night * .42;
+      ctx.fillStyle = "#ffd5e8";
+
+      for (let i = 0; i < 14; i++) {
+        const x =
+          ((i * 137 + 53) % Math.max(1, W - 30)) + 15;
+        const y =
+          waterY -
+          26 -
+          ((i * 43) % 74) +
+          Math.sin(time * 1.2 + i) * 3;
+        const pulse = .6 + Math.sin(time * 2 + i) * .34;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 1.2 + pulse * .7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  function cubicBezierValue(a, b, c, d, t) {
+    const inv = 1 - t;
+    return (
+      inv * inv * inv * a +
+      3 * inv * inv * t * b +
+      3 * inv * t * t * c +
+      t * t * t * d
+    );
+  }
+
+  function hillCurveYAtX(x, points) {
+    let low = 0;
+    let high = 1;
+
+    for (let iteration = 0; iteration < 12; iteration++) {
+      const mid = (low + high) / 2;
+      const curveX = cubicBezierValue(
+        points[0][0],
+        points[1][0],
+        points[2][0],
+        points[3][0],
+        mid
+      );
+
+      if (curveX < x) low = mid;
+      else high = mid;
+    }
+
+    const t = (low + high) / 2;
+    return cubicBezierValue(
+      points[0][1],
+      points[1][1],
+      points[2][1],
+      points[3][1],
+      t
+    );
+  }
+
+  function hillSurfaceYAtX(x, waterY, isBack) {
+    if (isBack) {
+      if (x <= W * .27) {
+        return hillCurveYAtX(x, [
+          [0, waterY - 89],
+          [W * .09, waterY - 172],
+          [W * .19, waterY - 119],
+          [W * .27, waterY - 82]
+        ]);
+      }
+
+      if (x <= W * .58) {
+        return hillCurveYAtX(x, [
+          [W * .27, waterY - 82],
+          [W * .38, waterY - 171],
+          [W * .50, waterY - 154],
+          [W * .58, waterY - 89]
+        ]);
+      }
+
+      return hillCurveYAtX(x, [
+        [W * .58, waterY - 89],
+        [W * .70, waterY - 172],
+        [W * .82, waterY - 138],
+        [W, waterY - 83]
+      ]);
+    }
+
+    if (x <= W * .34) {
+      return hillCurveYAtX(x, [
+        [0, waterY - 52],
+        [W * .12, waterY - 104],
+        [W * .25, waterY - 89],
+        [W * .34, waterY - 44]
+      ]);
+    }
+
+    if (x <= W * .72) {
+      return hillCurveYAtX(x, [
+        [W * .34, waterY - 44],
+        [W * .48, waterY - 121],
+        [W * .62, waterY - 109],
+        [W * .72, waterY - 45]
+      ]);
+    }
+
+    return hillCurveYAtX(x, [
+      [W * .72, waterY - 45],
+      [W * .84, waterY - 101],
+      [W * .92, waterY - 84],
+      [W, waterY - 49]
+    ]);
+  }
+
+  function rebuildFlowerLayouts() {
+    const waterY = H * waterYRatio;
+
+    ["back", "front"].forEach(depth => {
+      const isBack = depth === "back";
+      const count = isBack ? 30 : 48;
+      const usableWidth = Math.max(60, W - 30);
+      const spacing = usableWidth / count;
+      const layout = [];
+
+      for (let i = 0; i < count; i++) {
+        const x =
+          15 +
+          spacing * (i + .5) +
+          Math.sin(i * 2.17) * spacing * .20;
+        const surfaceY = hillSurfaceYAtX(x, waterY, isBack);
+        const stemHeight =
+          (isBack ? 5 : 9) +
+          ((i * 5) % (isBack ? 4 : 7));
+
+        layout.push({
+          x,
+          surfaceY,
+          flowerY: surfaceY - stemHeight,
+          stemHeight,
+          size:
+            (isBack ? 1.55 : 2.65) +
+            (i % 3) * (isBack ? .14 : .22),
+          paletteIndex: (i * 3 + (isBack ? 1 : 0)) % 4
+        });
+      }
+
+      flowerLayouts[depth] = layout;
+    });
+  }
+
+  function drawHillFlowerFields(
+    waterY,
+    day,
+    time,
+    depth
+  ) {
+    const isBack = depth === "back";
+    const flowers = flowerLayouts[depth];
+    if (!flowers.length) return;
+
+    const visibility = isBack
+      ? lerp(.26, .64, day)
+      : lerp(.46, .94, day);
+    const stemColor = isBack
+      ? mixColor("#493451", "#819078", day)
+      : mixColor("#402f49", "#718a6b", day);
+    const flowerPalette = [
+      mixColor("#a96a92", "#ee9db4", day),
+      mixColor("#9273aa", "#d7b5e2", day),
+      mixColor("#ad846c", "#ebbd82", day),
+      mixColor("#a6617e", "#e98f9a", day)
+    ];
+    const centerColor = mixColor("#c993b6", "#ffe0a7", day);
+
+    ctx.save();
+    ctx.lineCap = "round";
+
+    // Simple straight stems, all anchored exactly on the hill.
+    ctx.globalAlpha = visibility * .84;
+    ctx.strokeStyle = stemColor;
+    ctx.lineWidth = isBack ? .75 : 1.15;
+    ctx.beginPath();
+    flowers.forEach(flower => {
+      ctx.moveTo(flower.x, flower.surfaceY + .5);
+      ctx.lineTo(flower.x, flower.flowerY);
+    });
+    ctx.stroke();
+
+    // Simple round flower heads grouped by palette.
+    flowerPalette.forEach((color, paletteIndex) => {
+      ctx.globalAlpha = visibility;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+
+      flowers.forEach(flower => {
+        if (flower.paletteIndex !== paletteIndex) return;
+        ctx.moveTo(flower.x + flower.size, flower.flowerY);
+        ctx.arc(
+          flower.x,
+          flower.flowerY,
+          flower.size,
+          0,
+          Math.PI * 2
+        );
+      });
+
+      ctx.fill();
+    });
+
+    // Small centers make them read clearly as flowers.
+    ctx.globalAlpha = visibility * .88;
+    ctx.fillStyle = centerColor;
+    ctx.beginPath();
+    flowers.forEach(flower => {
+      const centerSize = flower.size * .38;
+      ctx.moveTo(flower.x + centerSize, flower.flowerY);
+      ctx.arc(
+        flower.x,
+        flower.flowerY,
+        centerSize,
+        0,
+        Math.PI * 2
+      );
+    });
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+
+  function drawCuteVolcano(x, baseY, scale, day, time) {
+    ctx.save();
+    ctx.translate(x, baseY);
+    ctx.scale(scale, scale);
+
+    const transitionShock =
+      smoothstep(clamp((day - .18) / .44, 0, 1)) *
+      (1 - smoothstep(clamp((day - .70) / .20, 0, 1)));
+    const daytimeHappy = smoothstep(clamp((day - .58) / .34, 0, 1));
+    const nightCalm = 1 - smoothstep(clamp(day / .30, 0, 1));
+
+    // Softer, more natural volcano silhouette with broad rounded shoulders
+    // and a narrower summit.
+    const volcanoGradient = ctx.createLinearGradient(0, -174, 0, 2);
+    volcanoGradient.addColorStop(
+      0,
+      mixColor("#66345f", "#bf738f", day)
+    );
+    volcanoGradient.addColorStop(
+      .42,
+      mixColor("#764068", "#cf8198", day)
+    );
+    volcanoGradient.addColorStop(
+      .76,
+      mixColor("#7d486e", "#cf879e", day)
+    );
+    volcanoGradient.addColorStop(
+      1,
+      mixColor("#79456a", "#cb849b", day)
+    );
+
+    ctx.fillStyle = volcanoGradient;
+    ctx.beginPath();
+    ctx.moveTo(-122, 0);
+    ctx.bezierCurveTo(-104, -37, -91, -73, -67, -105);
+    ctx.bezierCurveTo(-50, -129, -39, -150, -27, -163);
+    ctx.bezierCurveTo(-17, -174, -8, -168, 0, -166);
+    ctx.bezierCurveTo(9, -170, 18, -174, 29, -162);
+    ctx.bezierCurveTo(43, -147, 54, -126, 70, -101);
+    ctx.bezierCurveTo(94, -65, 108, -31, 124, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // No separate underside overlay: the base remains within the
+    // same rose-purple body palette.
+
+    // Decorative rock contours stay on the outer slopes and never cross
+    // the face area.
+    ctx.save();
+    ctx.globalAlpha = lerp(.23, .34, day);
+    ctx.strokeStyle = mixColor("#a75e89", "#dfa0ab", day);
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+
+    const sideContours = [
+      [-94, -34, -78, -59, -62, -86],
+      [-81, -21, -64, -38, -48, -47],
+      [-58, -103, -49, -125, -36, -143],
+      [40, -143, 51, -125, 60, -104],
+      [65, -87, 82, -61, 98, -34],
+      [51, -48, 72, -39, 91, -20]
+    ];
+
+    sideContours.forEach(([x1, y1, cx, cy, x2, y2]) => {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.quadraticCurveTo(cx, cy, x2, y2);
+      ctx.stroke();
+    });
+    ctx.restore();
+
+    // Small scattered rock facets on the lower slopes.
+    ctx.save();
+    ctx.globalAlpha = lerp(.16, .25, day);
+    ctx.fillStyle = mixColor("#b27694", "#e0a7b2", day);
+    [
+      [-82, -14, 8, 4, -.2],
+      [-62, -67, 6, 3, .22],
+      [72, -16, 9, 4, .15],
+      [83, -54, 6, 3, -.18]
+    ].forEach(([fx, fy, rx, ry, rot]) => {
+      ctx.beginPath();
+      ctx.ellipse(fx, fy, rx, ry, rot, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // Compact crater fitted cleanly inside the summit.
+    const craterGradient = ctx.createLinearGradient(0, -174, 0, -154);
+    craterGradient.addColorStop(
+      0,
+      mixColor("#4a2444", "#8b5169", day)
+    );
+    craterGradient.addColorStop(
+      1,
+      mixColor("#321b36", "#704057", day)
+    );
+
+    ctx.fillStyle = craterGradient;
+    ctx.beginPath();
+    ctx.ellipse(1, -164, 25, 6.8, -.02, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Front rim follows the summit instead of floating above it.
+    ctx.globalAlpha = lerp(.48, .64, day);
+    ctx.strokeStyle = mixColor("#94527a", "#d78c9c", day);
+    ctx.lineWidth = 1.7;
+    ctx.beginPath();
+    ctx.ellipse(1, -163, 26, 7.3, -.02, 0, Math.PI);
+    ctx.stroke();
+
+    ctx.globalAlpha = lerp(.27, .40, day);
+    ctx.strokeStyle = mixColor("#c2749b", "#eeabb0", day);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(1, -166, 19, 3.7, -.02, Math.PI, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Seamless steam: each puff disappears fully before recycling.
+    const steamBaseAlpha = lerp(.18, .50, day);
+    const steamColor = mixColor("#b98bb4", "#ffe1d5", day);
+    ctx.fillStyle = steamColor;
+
+    for (let i = 0; i < 5; i++) {
+      const cycle = (time * .105 + i * .19) % 1;
+      const fade = Math.sin(Math.PI * cycle);
+      const puffX =
+        -12 +
+        i * 6 +
+        Math.sin(time * .55 + i * 1.7) * (4.5 + i * .35);
+      const puffY = -181 - cycle * 77;
+      const radius = 6.5 + cycle * 7.5 + (i % 2) * 1.3;
+
+      ctx.globalAlpha = steamBaseAlpha * fade;
+      ctx.beginPath();
+      ctx.arc(puffX, puffY, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = steamBaseAlpha * fade * .54;
+      ctx.beginPath();
+      ctx.arc(
+        puffX + radius * .55,
+        puffY + 1.5,
+        radius * .68,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Face grooves are only slightly darker than the body.
+    const faceY = -82;
+    const faceColor = mixColor("#592c50", "#a9617c", day);
+
+    ctx.save();
+    ctx.globalAlpha = .84;
+    ctx.strokeStyle = faceColor;
+    ctx.fillStyle = faceColor;
+    ctx.lineWidth = 4.2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    if (transitionShock > .12) {
+      // Sunrise: open round eyes and a pronounced O mouth.
+      const eyeRadius = lerp(3.5, 6.5, transitionShock);
+      [-23, 23].forEach(eyeX => {
+        ctx.beginPath();
+        ctx.arc(eyeX, faceY - 5, eyeRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      const mouthRadius = lerp(6, 11, transitionShock);
+      ctx.beginPath();
+      ctx.ellipse(
+        0,
+        faceY + 25,
+        mouthRadius * .72,
+        mouthRadius,
+        0,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+    } else if (daytimeHappy > .15) {
+      // Day: high happy crescent eyes and a large open grin.
+      [-24, 24].forEach(eyeX => {
+        ctx.beginPath();
+        ctx.arc(
+          eyeX,
+          faceY - 4,
+          9,
+          .10 * Math.PI,
+          .90 * Math.PI
+        );
+        ctx.stroke();
+      });
+
+      ctx.beginPath();
+      ctx.moveTo(-23, faceY + 17);
+      ctx.quadraticCurveTo(0, faceY + 39, 23, faceY + 17);
+      ctx.quadraticCurveTo(0, faceY + 31, -23, faceY + 17);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Small carved cheek marks make daytime clearly happier.
+      ctx.globalAlpha = daytimeHappy * .36;
+      ctx.lineWidth = 3;
+      [-38, 38].forEach(cheekX => {
+        ctx.beginPath();
+        ctx.moveTo(cheekX - 5, faceY + 13);
+        ctx.lineTo(cheekX + 5, faceY + 11);
+        ctx.stroke();
+      });
+      ctx.globalAlpha = .84;
+    } else {
+      // Night: drooping sleepy eyelids and a tiny neutral mouth.
+      [-23, 23].forEach(eyeX => {
+        ctx.beginPath();
+        ctx.moveTo(eyeX - 8, faceY - 1);
+        ctx.quadraticCurveTo(
+          eyeX,
+          faceY + 5 + nightCalm * 2,
+          eyeX + 8,
+          faceY - 1
+        );
+        ctx.stroke();
+      });
+
+      ctx.lineWidth = 3.6;
+      ctx.beginPath();
+      ctx.moveTo(-7, faceY + 24);
+      ctx.quadraticCurveTo(0, faceY + 21, 7, faceY + 24);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
+    // Tiny flowers at the volcano base during daytime.
+    if (day > .25) {
+      ctx.globalAlpha = day * .72;
+      [
+        [-76, -6, "#ffc0d4"],
+        [-51, -10, "#ffe0a4"],
+        [58, -8, "#e5c2ef"],
+        [81, -4, "#ffb8ca"]
+      ].forEach(([flowerX, flowerY, color]) => {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(flowerX, flowerY, 3.2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+  }
+
+  function drawWater(waterY, day) {
+    const time = performance.now() * .001;
+    const waterGradient = ctx.createLinearGradient(0, waterY, 0, H);
+
+    waterGradient.addColorStop(0, mixColor("#ff70af", "#ffacd0", day));
+    waterGradient.addColorStop(.22, mixColor("#e45297", "#f08db8", day));
+    waterGradient.addColorStop(.58, mixColor("#a3367f", "#cf6fa8", day));
+    waterGradient.addColorStop(1, mixColor("#651c59", "#9d5a8c", day));
+
+    ctx.fillStyle = waterGradient;
+    ctx.fillRect(cameraX, waterY, W + 120, H - waterY + 4);
+
+    const horizonGlow = ctx.createLinearGradient(0, waterY, 0, waterY + 88);
+    horizonGlow.addColorStop(0, `rgba(255, 241, 246, ${lerp(.12, .44, day)})`);
+    horizonGlow.addColorStop(.6, `rgba(255, 231, 241, ${lerp(.06, .18, day)})`);
+    horizonGlow.addColorStop(1, "rgba(255, 235, 244, 0)");
+    ctx.fillStyle = horizonGlow;
+    ctx.fillRect(cameraX, waterY, W + 120, 92);
+
+    for (let row = 0; row < 10; row++) {
+      const depth = row / 9;
+      const y = waterY + 10 + row * 27;
+      const alpha = lerp(.18, .5, day) * (1 - depth * .30);
+      const amplitude = 2.6 + depth * 4.2;
+      const spacing = 16 + depth * 6;
+
+      ctx.beginPath();
+      for (let x = cameraX - 90; x < cameraX + W + 140; x += spacing) {
+        const wave =
+          Math.sin(x * .027 + time * (1.1 + depth) + row * .77) * amplitude;
+        const secondWave =
+          Math.sin(x * .012 - time * .72 + row * 1.2) * amplitude * .34;
+        const pointY = y + wave + secondWave;
+
+        if (x === cameraX - 90) ctx.moveTo(x, pointY);
+        else ctx.lineTo(x, pointY);
+      }
+
+      ctx.strokeStyle = `rgba(255, 247, 251, ${alpha})`;
+      ctx.lineWidth = lerp(1.2, 2.25, day);
+      ctx.stroke();
+    }
+
+    function drawCoralPatch(x, y, scale, toneShift) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.globalAlpha = lerp(.16, .68, day);
+
+      ctx.strokeStyle = toneShift === 0
+        ? mixColor("#69405f", "#ffcfb7", day)
+        : mixColor("#573859", "#f0b781", day);
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * 6, 0);
+        ctx.quadraticCurveTo(
+          i * 10,
+          -16 - Math.abs(i) * 4,
+          i * 4,
+          -34 - Math.abs(i) * 7
+        );
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = toneShift === 0
+        ? mixColor("#744364", "#ffb9a6", day)
+        : mixColor("#60375b", "#ef9a79", day);
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(-20, 0);
+      ctx.quadraticCurveTo(-26, -20, -14, -34);
+      ctx.moveTo(-12, -8);
+      ctx.quadraticCurveTo(-4, -26, 4, -42);
+      ctx.moveTo(6, -2);
+      ctx.quadraticCurveTo(18, -20, 14, -40);
+      ctx.moveTo(18, -6);
+      ctx.quadraticCurveTo(28, -18, 32, -30);
+      ctx.stroke();
+
+      ctx.fillStyle = mixColor("#80516f", "#ffe7cb", day);
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.ellipse(-16 + i * 15, 5, 5 + i, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    const clusterStart = Math.floor((cameraX - 120) / 360) * 360;
+    for (let x = clusterStart; x < cameraX + W + 160; x += 360) {
+      const y = H - 16 - (Math.sin(x * .01) > 0 ? 0 : 12);
+      const scale = .78 + Math.abs(Math.sin(x * .017)) * .45;
+      drawCoralPatch(x + 58, y, scale, x % 720 === 0 ? 0 : 1);
+    }
+
+    function drawFish(x, y, size, dir, colorA, colorB) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(dir, 1);
+      ctx.globalAlpha = lerp(.22, .86, day);
+
+      const body = ctx.createLinearGradient(-size, 0, size, 0);
+      body.addColorStop(0, colorA);
+      body.addColorStop(1, colorB);
+
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, size * 1.2, size * .6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(-size * 1.2, 0);
+      ctx.lineTo(-size * 2.0, -size * .7);
+      ctx.lineTo(-size * 2.0, size * .7);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = `rgba(255,255,255,${lerp(.06, .46, day)})`;
+      ctx.beginPath();
+      ctx.ellipse(size * .2, -size * .15, size * .5, size * .16, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = mixColor("#2f2038", "#6f3257", day);
+      ctx.beginPath();
+      ctx.arc(size * .65, -size * .08, Math.max(1.2, size * .09), 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    for (let i = 0; i < 7; i++) {
+      const dir = i % 2 === 0 ? 1 : -1;
+      const swim = time * (20 + i * 3) * dir * 1.9;
+      const loopWidth = W + 320;
+      const baseX =
+        cameraX - 100 +
+        ((i * 187 + swim) % loopWidth + loopWidth) % loopWidth;
+      const baseY =
+        waterY +
+        78 +
+        ((i * 41) % Math.max(70, H - waterY - 120)) +
+        Math.sin(time * 1.3 + i) * 9;
+      const size = 7 + (i % 3) * 2.5;
+      const colorA = i % 2 === 0
+        ? mixColor("#72506e", "#ffe7c0", day)
+        : mixColor("#634663", "#ffb1a7", day);
+      const colorB = i % 2 === 0
+        ? mixColor("#563b5d", "#efac84", day)
+        : mixColor("#4c3557", "#d8867f", day);
+      drawFish(baseX, baseY, size, dir, colorA, colorB);
+    }
+
+    // Lily pads and flowers at the surface.
+    for (let i = 0; i < 7; i++) {
+      const driftX =
+        cameraX +
+        ((i * 281 + time * (5 + i * .65)) % (W + 280)) -
+        120;
+      const driftY =
+        waterY +
+        42 +
+        (i % 3) * 34 +
+        Math.sin(time * .72 + i) * 4;
+      const padSize = 11 + (i % 3) * 3;
+
+      ctx.save();
+      ctx.translate(driftX, driftY);
+      ctx.rotate(Math.sin(time * .31 + i) * .15);
+      ctx.globalAlpha = lerp(.10, .72, day);
+
+      ctx.fillStyle = mixColor("#4d354f", "#72a98a", day);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, padSize * 1.45, padSize * .56, 0, 0, Math.PI * 2);
+      ctx.lineTo(2, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = mixColor("#65445f", "#a7d4a7", day);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-padSize * .7, 0);
+      ctx.lineTo(padSize * .65, 0);
+      ctx.stroke();
+
+      if (i % 2 === 0) {
+        ctx.fillStyle = i % 4 === 0
+          ? mixColor("#ffd1e7", "#fff0bd", day)
+          : mixColor("#f4a7cf", "#ffd2cd", day);
+
+        for (let petal = 0; petal < 5; petal++) {
+          const angle = petal * Math.PI * 2 / 5;
+          ctx.beginPath();
+          ctx.ellipse(
+            Math.cos(angle) * 4,
+            Math.sin(angle) * 4 - 2,
+            3.4,
+            1.9,
+            angle,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        }
+
+        ctx.fillStyle = "#fff0a8";
+        ctx.beginPath();
+        ctx.arc(0, -2, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // Sea grass and shell details along the river bed.
+    const plantStart = Math.floor((cameraX - 140) / 250) * 250;
+    for (let x = plantStart; x < cameraX + W + 180; x += 250) {
+      const baseY = H - 7;
+      const sway = Math.sin(time * 1.2 + x * .013) * 8;
+
+      ctx.save();
+      ctx.globalAlpha = lerp(.11, .62, day);
+      ctx.strokeStyle = mixColor("#46344f", "#6d9f82", day);
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+
+      for (let blade = 0; blade < 4; blade++) {
+        const bx = x + 28 + blade * 8;
+        const height = 24 + blade * 7 + Math.abs(Math.sin(x + blade)) * 10;
+        ctx.beginPath();
+        ctx.moveTo(bx, baseY);
+        ctx.quadraticCurveTo(
+          bx + sway * (.45 + blade * .08),
+          baseY - height * .55,
+          bx + sway,
+          baseY - height
+        );
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = mixColor("#5c4058", "#efb28f", day);
+      ctx.beginPath();
+      ctx.arc(x + 78, baseY - 5, 7, Math.PI, Math.PI * 2);
+      ctx.lineTo(x + 85, baseY - 5);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = mixColor("#75526d", "#ffe3bd", day);
+      ctx.lineWidth = 1;
+      for (let ridge = 1; ridge < 4; ridge++) {
+        ctx.beginPath();
+        ctx.arc(x + 78, baseY - 5, ridge * 1.6, Math.PI, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // Surface glints and heart-shaped ripples.
+    for (let i = 0; i < 16; i++) {
+      const x =
+        cameraX +
+        ((i * 239 + Math.sin(time * .42 + i) * 76) % (W + 180)) -
+        50;
+      const y =
+        waterY +
+        34 +
+        ((i * 73) % Math.max(90, H - waterY - 58));
+      const pulse = .55 + Math.sin(time * 1.8 + i) * .35;
+
+      ctx.save();
+      ctx.globalAlpha = lerp(.11, .44, day) * pulse;
+
+      if (i % 3 === 0) {
+        ctx.strokeStyle = i % 2 === 0 ? "#fff4d5" : "#ffe8f3";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 12 + pulse * 6, 4 + pulse * 2, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = i % 2 === 0 ? "#fff0da" : "#ffe8f4";
+        ctx.translate(x, y);
+        ctx.rotate(Math.PI / 4);
+        ctx.fillRect(-1.5, -6, 3, 12);
+        ctx.fillRect(-6, -1.5, 12, 3);
+      }
+      ctx.restore();
+    }
+
+    for (let i = 0; i < 12; i++) {
+      const bubbleBaseX = clusterStart + i * 180 + 44;
+      const x = bubbleBaseX + Math.sin(time * .8 + i) * 6;
+      const y = H - 30 - ((time * 34 + i * 23) % 95);
+
+      ctx.save();
+      ctx.globalAlpha = lerp(.05, .22, day);
+      ctx.strokeStyle = "#fff8fc";
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.arc(x, y, 2.5 + (i % 3), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  function drawPlatform(index, y, day) {
+    const p = platforms[index];
+    const waterSurface = H * waterYRatio;
+    const time = performance.now() * .001;
+    const float = Math.sin(time * .38 + index * .67) * .12;
+    const py = y + float;
+    const halfW = p.width / 2;
+
+    // Small deterministic variations stop every slab from looking copied.
+    const leftChip = 7 + ((index * 5) % 8);
+    const rightChip = 8 + ((index * 7) % 9);
+    const topBump = Math.sin(index * 1.31) * 2.2;
+    const lowerBump = Math.cos(index * .91) * 2.0;
+    const stoneDepth = 22;
+
+    ctx.save();
+
+    // Palette-matched reflection and shadow beneath each stone.
+    const waterGlow = ctx.createRadialGradient(
+      p.x,
+      waterSurface + 4,
+      2,
+      p.x,
+      waterSurface + 5,
+      p.width * .58
+    );
+    waterGlow.addColorStop(
+      0,
+      `rgba(241, 125, 176, ${lerp(.18, .24, day)})`
+    );
+    waterGlow.addColorStop(
+      .5,
+      `rgba(187, 73, 137, ${lerp(.09, .14, day)})`
+    );
+    waterGlow.addColorStop(1, "rgba(187, 73, 137, 0)");
+
+    ctx.fillStyle = waterGlow;
+    ctx.beginPath();
+    ctx.ellipse(
+      p.x,
+      waterSurface + 6,
+      p.width * .58,
+      12,
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+
+    ctx.fillStyle = `rgba(72, 25, 67, ${lerp(.23, .12, day)})`;
+    ctx.beginPath();
+    ctx.ellipse(
+      p.x,
+      waterSurface + 6,
+      p.width * .42,
+      5.2,
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+
+    ctx.strokeStyle =
+      `rgba(255, 225, 240, ${lerp(.14, .29, day)})`;
+    ctx.lineWidth = 1.05;
+
+    ctx.beginPath();
+    ctx.ellipse(
+      p.x,
+      waterSurface + 5,
+      p.width * .48,
+      6.4,
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+
+    ctx.globalAlpha = .44;
+    ctx.beginPath();
+    ctx.ellipse(
+      p.x,
+      waterSurface + 5,
+      p.width * .61,
+      9.2,
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Stacked broken ledges behind the main slab create visible depth.
+    const backLayers = [
+      {
+        widthScale: 1.08,
+        dx: -3 + Math.sin(index * .83) * 2,
+        dy: 7,
+        depth: 13,
+        alpha: .92,
+        topNight: "#bc4c89",
+        topDay: "#ce718b",
+        bottomNight: "#71305f",
+        bottomDay: "#87506c"
+      },
+      {
+        widthScale: .91,
+        dx: 7 + Math.cos(index * .71) * 2,
+        dy: 15,
+        depth: 12,
+        alpha: .80,
+        topNight: "#9e3e79",
+        topDay: "#b8617c",
+        bottomNight: "#5e2855",
+        bottomDay: "#74455f"
+      },
+      {
+        widthScale: .72,
+        dx: -7 + Math.sin(index * .57) * 2,
+        dy: 23,
+        depth: 10,
+        alpha: .68,
+        topNight: "#803467",
+        topDay: "#98526e",
+        bottomNight: "#482044",
+        bottomDay: "#62394f"
+      }
+    ];
+
+    backLayers.forEach((layer, layerIndex) => {
+      const layerHalfW = halfW * layer.widthScale;
+      const layerX = p.x + layer.dx;
+      const layerY = py + layer.dy;
+      const notchA = 4 + ((index + layerIndex * 3) % 7);
+      const notchB = 5 + ((index * 2 + layerIndex) % 6);
+
+      const layerGradient = ctx.createLinearGradient(
+        layerX,
+        layerY - 3,
+        layerX,
+        layerY + layer.depth
+      );
+      layerGradient.addColorStop(
+        0,
+        mixColor(layer.topNight, layer.topDay, day)
+      );
+      layerGradient.addColorStop(
+        1,
+        mixColor(layer.bottomNight, layer.bottomDay, day)
+      );
+
+      ctx.save();
+      ctx.globalAlpha = layer.alpha;
+      ctx.fillStyle = layerGradient;
+      ctx.beginPath();
+      ctx.moveTo(layerX - layerHalfW + notchA, layerY);
+      ctx.lineTo(layerX - layerHalfW * .52, layerY - 2);
+      ctx.lineTo(layerX - layerHalfW * .14, layerY + 1);
+      ctx.lineTo(layerX + layerHalfW * .22, layerY - 1);
+      ctx.lineTo(layerX + layerHalfW - notchB, layerY + 1);
+      ctx.lineTo(layerX + layerHalfW - 2, layerY + 5);
+      ctx.lineTo(layerX + layerHalfW - 8, layerY + layer.depth);
+      ctx.lineTo(layerX + layerHalfW * .28, layerY + layer.depth + 2);
+      ctx.lineTo(layerX - layerHalfW * .18, layerY + layer.depth);
+      ctx.lineTo(layerX - layerHalfW + 7, layerY + layer.depth - 2);
+      ctx.lineTo(layerX - layerHalfW + 2, layerY + 5);
+      ctx.closePath();
+      ctx.fill();
+
+      // Bright separator rim makes the stacked strata readable.
+      ctx.globalAlpha = layer.alpha * lerp(.46, .62, day);
+      ctx.strokeStyle = mixColor("#e98ab4", "#eba3a8", day);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(layerX - layerHalfW + notchA, layerY);
+      ctx.lineTo(layerX - layerHalfW * .52, layerY - 2);
+      ctx.lineTo(layerX - layerHalfW * .14, layerY + 1);
+      ctx.lineTo(layerX + layerHalfW * .22, layerY - 1);
+      ctx.lineTo(layerX + layerHalfW - notchB, layerY + 1);
+      ctx.stroke();
+
+      // A small crack on each visible layer.
+      ctx.globalAlpha = layer.alpha * .35;
+      ctx.strokeStyle = mixColor("#4f214b", "#6b3d50", day);
+      ctx.lineWidth = .9;
+      const crackX = layerX + (layerIndex - 1) * layerHalfW * .22;
+      ctx.beginPath();
+      ctx.moveTo(crackX, layerY + 1);
+      ctx.lineTo(crackX - 2, layerY + 5);
+      ctx.lineTo(crackX + 2, layerY + 9);
+      ctx.stroke();
+
+      ctx.restore();
+    });
+
+    // Crumbling stone body.
+    const stoneGradient = ctx.createLinearGradient(
+      p.x,
+      py - 5,
+      p.x,
+      py + stoneDepth + 5
+    );
+    stoneGradient.addColorStop(
+      0,
+      mixColor("#ffdce9", "#ffe7df", day)
+    );
+    stoneGradient.addColorStop(
+      .30,
+      mixColor("#ec8db5", "#eea1ae", day)
+    );
+    stoneGradient.addColorStop(
+      .70,
+      mixColor("#c34f8c", "#ce718e", day)
+    );
+    stoneGradient.addColorStop(
+      1,
+      mixColor("#7f2e6a", "#955170", day)
+    );
+
+    ctx.fillStyle = stoneGradient;
+    ctx.beginPath();
+    ctx.moveTo(p.x - halfW + leftChip, py + 3);
+    ctx.lineTo(p.x - halfW * .58, py - 1 + topBump);
+    ctx.lineTo(p.x - halfW * .20, py + 1);
+    ctx.lineTo(p.x + halfW * .10, py - 2 - topBump * .45);
+    ctx.lineTo(p.x + halfW * .48, py + 1 + topBump * .25);
+    ctx.lineTo(p.x + halfW - rightChip, py + 3);
+    ctx.lineTo(p.x + halfW - 4, py + 9);
+    ctx.lineTo(p.x + halfW - 11, py + 14);
+    ctx.lineTo(p.x + halfW - 8, py + stoneDepth - 4);
+    ctx.lineTo(p.x + halfW * .46, py + stoneDepth + lowerBump);
+    ctx.lineTo(p.x + halfW * .18, py + stoneDepth - 1);
+    ctx.lineTo(p.x - halfW * .14, py + stoneDepth + 3 - lowerBump * .35);
+    ctx.lineTo(p.x - halfW * .44, py + stoneDepth);
+    ctx.lineTo(p.x - halfW + 9, py + stoneDepth - 5);
+    ctx.lineTo(p.x - halfW + 4, py + 13);
+    ctx.closePath();
+    ctx.fill();
+
+    // Pale upper edge catches the sky color.
+    ctx.strokeStyle = day < .5
+      ? "rgba(255, 210, 232, .48)"
+      : "rgba(255, 238, 229, .66)";
+    ctx.lineWidth = 1.35;
+    ctx.beginPath();
+    ctx.moveTo(p.x - halfW + leftChip, py + 3);
+    ctx.lineTo(p.x - halfW * .58, py - 1 + topBump);
+    ctx.lineTo(p.x - halfW * .20, py + 1);
+    ctx.lineTo(p.x + halfW * .10, py - 2 - topBump * .45);
+    ctx.lineTo(p.x + halfW * .48, py + 1 + topBump * .25);
+    ctx.lineTo(p.x + halfW - rightChip, py + 3);
+    ctx.stroke();
+
+    // Subtle top highlight.
+    ctx.save();
+    ctx.globalAlpha = lerp(.22, .33, day);
+    ctx.strokeStyle = "#fff8fb";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(p.x - halfW * .48, py + 4);
+    ctx.quadraticCurveTo(
+      p.x - halfW * .08,
+      py - 1,
+      p.x + halfW * .37,
+      py + 4
+    );
+    ctx.stroke();
+    ctx.restore();
+
+    // Crack network.
+    ctx.save();
+    ctx.globalAlpha = lerp(.34, .42, day);
+    ctx.strokeStyle = mixColor("#7f315f", "#98536a", day);
+    ctx.lineWidth = 1.05;
+    ctx.lineCap = "round";
+
+    const crackX = p.x - halfW * .12 + ((index % 3) - 1) * 6;
+    ctx.beginPath();
+    ctx.moveTo(crackX, py + 2);
+    ctx.lineTo(crackX - 3, py + 8);
+    ctx.lineTo(crackX + 2, py + 12);
+    ctx.lineTo(crackX - 1, py + 18);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(crackX - 2, py + 9);
+    ctx.lineTo(crackX - 11, py + 12);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(crackX + 1, py + 13);
+    ctx.lineTo(crackX + 10, py + 16);
+    ctx.stroke();
+    ctx.restore();
+
+    // A couple of tiny broken chips hover close to the main slab.
+    const chipColor = mixColor("#b74682", "#c96e86", day);
+    ctx.fillStyle = chipColor;
+
+    ctx.save();
+    ctx.translate(p.x - halfW - 5, py + 14);
+    ctx.rotate(-.22);
+    ctx.beginPath();
+    ctx.moveTo(-3, -2);
+    ctx.lineTo(4, -1);
+    ctx.lineTo(2, 4);
+    ctx.lineTo(-4, 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    if (index % 3 !== 1) {
+      ctx.save();
+      ctx.translate(p.x + halfW + 4, py + 11);
+      ctx.rotate(.28);
+      ctx.beginPath();
+      ctx.moveTo(-3, -2);
+      ctx.lineTo(3, -1);
+      ctx.lineTo(2, 3);
+      ctx.lineTo(-4, 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Foreground fragments overlap the slab slightly for z-depth.
+    const frontRockColor = mixColor("#b94a86", "#ca6f87", day);
+    [
+      { dx: -halfW * .56, dy: stoneDepth + 8, scale: .72, rot: .18 },
+      { dx:  halfW * .50, dy: stoneDepth + 11, scale: .60, rot: -.22 }
+    ].forEach((rock, rockIndex) => {
+      if ((index + rockIndex) % 3 === 1) return;
+
+      ctx.save();
+      ctx.translate(p.x + rock.dx, py + rock.dy);
+      ctx.rotate(rock.rot);
+      ctx.globalAlpha = .88;
+      ctx.fillStyle = frontRockColor;
+      ctx.beginPath();
+      ctx.moveTo(-7 * rock.scale, -3 * rock.scale);
+      ctx.lineTo(5 * rock.scale, -4 * rock.scale);
+      ctx.lineTo(8 * rock.scale, 2 * rock.scale);
+      ctx.lineTo(1 * rock.scale, 7 * rock.scale);
+      ctx.lineTo(-8 * rock.scale, 3 * rock.scale);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.globalAlpha = .30;
+      ctx.strokeStyle = mixColor("#f08fb8", "#eea0a1", day);
+      ctx.lineWidth = .8;
+      ctx.beginPath();
+      ctx.moveTo(-4 * rock.scale, -1 * rock.scale);
+      ctx.lineTo(3 * rock.scale, -2 * rock.scale);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // Hanging heart charm beneath selected stones.
+    if (
+      index > 0 &&
+      index < platforms.length - 1 &&
+      index % 6 === 3
+    ) {
+      const charmX = p.x + (index % 2 === 0 ? -halfW * .22 : halfW * .22);
+      const stringTop = py + stoneDepth - 1;
+      const stringLength = 10 + (index % 3) * 3;
+
+      ctx.strokeStyle =
+        `rgba(255, 200, 225, ${lerp(.42, .58, day)})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(charmX, stringTop);
+      ctx.lineTo(charmX, stringTop + stringLength);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(charmX, stringTop + stringLength + 5);
+      ctx.globalAlpha = lerp(.62, .78, day);
+      ctx.fillStyle = mixColor("#ef77ad", "#ed9b91", day);
+      drawHeartShape(ctx, 0, 0, 5.2);
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  function drawKeyPrompt(index, y, day) {
+    const p = platforms[index];
+    const success =
+      correctKeyFeedback &&
+      correctKeyFeedback.index === index
+        ? correctKeyFeedback
+        : null;
+    const error =
+      wrongKeyFeedback &&
+      wrongKeyFeedback.index === index
+        ? wrongKeyFeedback
+        : null;
+    const feedback = success || error;
+    const effectT = feedback
+      ? clamp(feedback.age / feedback.duration, 0, 1)
+      : 0;
+    const effectEase = smootherstep(effectT);
+    const effectFade = success
+      ? 1 - smootherstep(clamp((effectT - .70) / .30, 0, 1))
+      : 1;
+
+    const successPulse = success
+      ? Math.sin(Math.PI * effectT) * .18
+      : 0;
+    const errorPulse = error
+      ? Math.sin(Math.PI * effectT) * .07
+      : 0;
+    const idlePulse = Math.sin(performance.now() / 260) * .06;
+    const pulse = 1 + idlePulse + successPulse + errorPulse;
+    const rise = success ? effectEase * 14 : 0;
+    const errorShake = error
+      ? Math.sin(effectT * Math.PI * 9) * (1 - effectT) * 7
+      : 0;
+
+    ctx.save();
+    ctx.translate(p.x + errorShake, y - 52 - rise);
+    ctx.scale(pulse, pulse);
+    ctx.globalAlpha = effectFade;
+
+    if (success) {
+      // Compact success glow and heart/spark burst.
+      const glowRadius = 34 + effectEase * 18;
+      const glow = ctx.createRadialGradient(
+        0,
+        0,
+        4,
+        0,
+        0,
+        glowRadius
+      );
+      glow.addColorStop(
+        0,
+        `rgba(255, 244, 250, ${.66 * effectFade})`
+      );
+      glow.addColorStop(
+        .38,
+        `rgba(255, 126, 183, ${.40 * effectFade})`
+      );
+      glow.addColorStop(1, "rgba(255, 104, 173, 0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      const burstRadius = 18 + effectEase * 30;
+      for (let i = 0; i < 8; i++) {
+        const angle = -Math.PI / 2 + i * Math.PI * 2 / 8;
+        const sx = Math.cos(angle) * burstRadius;
+        const sy = Math.sin(angle) * burstRadius;
+
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(angle + Math.PI / 2);
+        ctx.globalAlpha = (1 - effectT) * .88;
+
+        if (i % 2 === 0) {
+          ctx.fillStyle = i % 4 === 0 ? "#fff5fa" : "#ff85b9";
+          drawHeartShape(ctx, 0, 0, 3.8 + effectEase * 1.2);
+        } else {
+          ctx.strokeStyle = i % 3 === 0 ? "#ffe3a8" : "#ffc0dc";
+          ctx.lineWidth = 1.5;
+          const ray = 3 + effectEase * 4;
+          ctx.beginPath();
+          ctx.moveTo(-ray, 0);
+          ctx.lineTo(ray, 0);
+          ctx.moveTo(0, -ray);
+          ctx.lineTo(0, ray);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      ctx.globalAlpha = (1 - effectT) * .58;
+      ctx.strokeStyle = "#fff1f8";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(0, 0, 29 + effectEase * 15, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = effectFade;
+    }
+
+    if (error) {
+      // Compact red warning glow.
+      const warningFade =
+        1 - smootherstep(clamp((effectT - .66) / .34, 0, 1));
+      const glowRadius = 33 + effectEase * 15;
+      const redGlow = ctx.createRadialGradient(
+        0,
+        0,
+        5,
+        0,
+        0,
+        glowRadius
+      );
+      redGlow.addColorStop(
+        0,
+        `rgba(255, 226, 229, ${.54 * warningFade})`
+      );
+      redGlow.addColorStop(
+        .36,
+        `rgba(255, 64, 87, ${.42 * warningFade})`
+      );
+      redGlow.addColorStop(1, "rgba(151, 20, 43, 0)");
+      ctx.fillStyle = redGlow;
+      ctx.beginPath();
+      ctx.arc(0, 0, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Two warning rings moving outward.
+      ctx.strokeStyle = "#ff8e9f";
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = warningFade * .66;
+      ctx.beginPath();
+      ctx.arc(0, 0, 30 + effectEase * 12, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.globalAlpha = warningFade * .34;
+      ctx.beginPath();
+      ctx.arc(0, 0, 34 + effectEase * 19, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Crosses and tiny split-heart halves scatter outward.
+      const burstRadius = 18 + effectEase * 28;
+      for (let i = 0; i < 8; i++) {
+        const angle = Math.PI / 8 + i * Math.PI * 2 / 8;
+        const sx = Math.cos(angle) * burstRadius;
+        const sy = Math.sin(angle) * burstRadius;
+
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(angle + effectT * .8);
+        ctx.globalAlpha = (1 - effectT) * .82;
+
+        if (i % 2 === 0) {
+          ctx.strokeStyle = i % 4 === 0 ? "#fff0f2" : "#ff7188";
+          ctx.lineWidth = 1.8;
+          const cross = 3.6 + effectEase * 2.2;
+          ctx.beginPath();
+          ctx.moveTo(-cross, -cross);
+          ctx.lineTo(cross, cross);
+          ctx.moveTo(cross, -cross);
+          ctx.lineTo(-cross, cross);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = i % 3 === 0 ? "#ff9cab" : "#d94360";
+          ctx.beginPath();
+          ctx.arc(-2.1, -1.2, 2.5, Math.PI, Math.PI * 2);
+          ctx.arc(2.1, -1.2, 2.5, Math.PI, Math.PI * 2);
+          ctx.lineTo(0, 5.4);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.strokeStyle = "#fff0f2";
+          ctx.lineWidth = 1.1;
+          ctx.beginPath();
+          ctx.moveTo(-1, -3);
+          ctx.lineTo(1, -1);
+          ctx.lineTo(-1, 1);
+          ctx.lineTo(1, 3);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.fillStyle = success
+      ? mixColor("#ff78ad", "#fff0e8", day)
+      : error
+        ? mixColor("#9f294a", "#d94b5e", day)
+        : (
+          day < .5
+            ? "rgba(95, 24, 70, .88)"
+            : `rgba(255, 205, 221, ${lerp(.88, .96, day)})`
+        );
+    roundRect(ctx, -26, -26, 52, 52, 15);
+    ctx.fill();
+
+    ctx.strokeStyle = success
+      ? "rgba(255,255,255,.92)"
+      : error
+        ? "rgba(255, 224, 229, .92)"
+        : (
+          day < .5
+            ? "rgba(255, 171, 211, .48)"
+            : "rgba(184, 82, 126, .35)"
+        );
+    ctx.lineWidth = feedback ? 2.7 : 2;
+    roundRect(ctx, -26, -26, 52, 52, 15);
+    ctx.stroke();
+
+    ctx.fillStyle = success
+      ? mixColor("#fff9fc", "#983f65", day)
+      : error
+        ? "#fff4f5"
+        : mixColor("#ffe2f0", "#8a3e60", day);
+    ctx.font = '400 26px "Love Ya Like A Sister", cursive';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(p.key, 0, 1);
+
+    ctx.restore();
+  }
+
+
+  function drawReunionHeart(day) {
+    if (
+      !(
+        state === "reunion" ||
+        state === "heartFlood" ||
+        state === "ending"
+      ) ||
+      !transitionHeartSprites.length
+    ) {
+      return;
+    }
+
+    const appear =
+      state === "reunion"
+        ? smootherstep(clamp((stateTime - .34) / .62, 0, 1))
+        : 1;
+    const kissBoost =
+      state === "reunion"
+        ? smootherstep(clamp((stateTime - 1.48) / .48, 0, 1))
+        : 1;
+    const pulse =
+      1 +
+      Math.sin(performance.now() * .0048) * .075 +
+      kissBoost * .12;
+
+    // Twice the previous shared-heart size.
+    const displaySize = (96 + kissBoost * 16) * pulse;
+    const spriteIndex = day > .7 ? 5 : 1;
+    const sprite = transitionHeartSprites[spriteIndex];
+
+    const visibleKyleCenter = partner.x + 8;
+    const centerX = (player.x + visibleKyleCenter) / 2;
+    const characterTop = Math.min(
+      player.y - 164 + 30,
+      partner.y - 168 + 22
+    );
+    const centerY = characterTop - 58;
+
+    ctx.save();
+    ctx.globalAlpha = .94 * appear;
+    ctx.drawImage(
+      sprite,
+      centerX - displaySize / 2,
+      centerY - displaySize / 2,
+      displaySize,
+      displaySize
+    );
+
+    ctx.translate(centerX, centerY);
+    ctx.strokeStyle = day > .6 ? "#fff0da" : "#ffd4ea";
+    ctx.lineWidth = 1.6;
+    ctx.globalAlpha = appear * (.54 + kissBoost * .24);
+    for (let i = 0; i < 8; i++) {
+      const angle =
+        i * Math.PI / 4 +
+        performance.now() * .00022;
+      const radius = displaySize * .60;
+      const sx = Math.cos(angle) * radius;
+      const sy = Math.sin(angle) * radius;
+      ctx.beginPath();
+      ctx.moveTo(sx - 3.5, sy);
+      ctx.lineTo(sx + 3.5, sy);
+      ctx.moveTo(sx, sy - 3.5);
+      ctx.lineTo(sx, sy + 3.5);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+
+  function drawCharacter(
+    x,
+    platformYValue,
+    name,
+    shirt,
+    hair,
+    facing,
+    isHer,
+    day
+  ) {
+    const time = performance.now() * .001;
+    const bob = Math.sin(player.bob + x * .01) * 1.25;
+    const photo = isHer ? characterPhotos.her : characterPhotos.you;
+
+    const drawH = isHer ? 164 : 168;
+    const fallbackAspect = isHer ? .76 : .90;
+    const aspect =
+      photo.complete && photo.naturalWidth > 0
+        ? photo.naturalWidth / photo.naturalHeight
+        : fallbackAspect;
+    const drawW = drawH * aspect;
+
+    const feetY = platformYValue - 1 + bob;
+
+    // They do a short synchronized two-step, then lean inward for a
+    // held scrapbook-style kiss pose.
+    const reunionActive =
+      state === "reunion" ||
+      state === "heartFlood" ||
+      state === "ending";
+    const danceRamp =
+      state === "reunion"
+        ? smootherstep(clamp((stateTime - .30) / .38, 0, 1))
+        : 0;
+    const danceFade =
+      state === "reunion"
+        ? 1 - smootherstep(clamp((stateTime - 1.34) / .34, 0, 1))
+        : 0;
+    const danceAmount = danceRamp * danceFade;
+    const danceClock = Math.max(0, stateTime - .30);
+    const danceWave = Math.sin(danceClock * Math.PI * 2.65);
+    const danceBounce =
+      danceAmount *
+      Math.abs(Math.sin(danceClock * Math.PI * 5.3)) *
+      5.5;
+    const danceSide =
+      danceAmount * danceWave * (isHer ? -3.5 : 3.5);
+    const danceTilt =
+      danceAmount * danceWave * (isHer ? -.075 : .075);
+
+    const kissAmount =
+      state === "reunion"
+        ? smootherstep(clamp((stateTime - 1.48) / .48, 0, 1))
+        : (
+          state === "heartFlood" || state === "ending"
+            ? 1
+            : 0
+        );
+    const kissSide = kissAmount * (isHer ? 10 : -10);
+    const kissLift = kissAmount * (isHer ? 1.5 : 0);
+    const kissTilt = kissAmount * (isHer ? .105 : -.105);
+    const kissPulse =
+      kissAmount *
+      Math.sin(
+        (state === "reunion" ? stateTime : time) * 4.2
+      ) *
+      .008;
+
+    const characterVerticalOffset = isHer ? 8 : 0;
+    const centerY =
+      feetY -
+      drawH / 2 +
+      23 +
+      characterVerticalOffset -
+      danceBounce -
+      kissLift;
+
+    const reunionLean = reunionActive
+      ? (isHer ? .052 : -.052)
+      : 0;
+    const idleTilt =
+      (isHer ? -.025 : .025) +
+      Math.sin(time * .72 + x * .002) * .006;
+    const tilt =
+      idleTilt +
+      reunionLean +
+      danceTilt +
+      kissTilt +
+      kissPulse;
+
+    // Treiorika uses the original cutout direction; Kyle remains unchanged.
+    const photoDirection = 1;
+
+    const characterCenterOffset = isHer ? 0 : 8;
+
+    ctx.save();
+    ctx.translate(
+      x + characterCenterOffset + danceSide + kissSide,
+      centerY
+    );
+    ctx.rotate(tilt);
+    ctx.scale(photoDirection, 1);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    if (photo.complete && photo.naturalWidth > 0) {
+      const x0 = -drawW / 2;
+      const y0 = -drawH / 2;
+
+      ctx.drawImage(photo, x0, y0, drawW, drawH);
+
+      // Tiny scrapbook doodles.
+      ctx.strokeStyle = mixColor("#cd679e", "#e18a90", day);
+      ctx.lineWidth = 1.15;
+      ctx.globalAlpha = .76;
+
+      ctx.save();
+      ctx.translate(drawW / 2 + 7, -drawH * .16);
+      ctx.rotate(.14);
+      ctx.beginPath();
+      ctx.moveTo(0, 2);
+      ctx.bezierCurveTo(-5, -3, -9, 3, 0, 10);
+      ctx.bezierCurveTo(9, 3, 5, -3, 0, 2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(-drawW / 2 - 8, drawH * .18);
+      ctx.rotate(-.15);
+      ctx.beginPath();
+      ctx.moveTo(-4, 0);
+      ctx.lineTo(4, 0);
+      ctx.moveTo(0, -4);
+      ctx.lineTo(0, 4);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.fillStyle = isHer
+        ? mixColor("#c7839c", "#e8aeb8", day)
+        : mixColor("#6d8fb0", "#95b0ca", day);
+      roundRect(ctx, -26, -42, 52, 84, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(255,255,255,.9)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = '400 24px "Love Light", cursive';
+      ctx.fillText(isHer ? "T" : "K", 0, 0);
+    }
+
+    ctx.restore();
+
+    const nameAlpha =
+      state === "reunion"
+        ? 1 - smootherstep(clamp(stateTime / .55, 0, 1))
+        : (
+          state === "heartFlood" || state === "ending"
+            ? 0
+            : 1
+        );
+
+    if (nameAlpha > .01) {
+      ctx.save();
+      ctx.globalAlpha = nameAlpha;
+      ctx.textAlign = "center";
+      ctx.fillStyle =
+        day < .55
+          ? "rgba(255,255,255,.92)"
+          : `rgba(88,40,68,${lerp(.90, .97, day)})`;
+      ctx.font = '400 16px "Love Ya Like A Sister", cursive';
+      ctx.fillText(
+        name,
+        x,
+        platformYValue - drawH + 14 + bob - danceBounce
+      );
+      ctx.restore();
+    }
+  }
+
+
+  function buildTransitionHeartSprites() {
+    const colors = [
+      "#ff5fa3",
+      "#ff8fc2",
+      "#d873a8",
+      "#ffd1e6",
+      "#ff7895",
+      "#ff9eb5",
+      "#ffd0a6",
+      "#fff0c7",
+      "#e886a8"
+    ];
+
+    transitionHeartSprites = colors.map(color => {
+      const sprite = document.createElement("canvas");
+      sprite.width = 128;
+      sprite.height = 128;
+      const spriteCtx = sprite.getContext("2d");
+
+      spriteCtx.translate(64, 67);
+      spriteCtx.fillStyle = color;
+      spriteCtx.shadowColor = "rgba(255, 97, 157, .34)";
+      spriteCtx.shadowBlur = 12;
+      drawHeartShape(spriteCtx, 0, 0, 34);
+
+      spriteCtx.shadowBlur = 0;
+      spriteCtx.globalAlpha = .34;
+      spriteCtx.fillStyle = "#ffffff";
+      spriteCtx.beginPath();
+      spriteCtx.ellipse(-11, -18, 5, 10, -.5, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      return sprite;
+    });
+  }
+
+  function drawTransitionSparkles() {
+    transitionSparkles.forEach(sparkle => {
+      const alpha = clamp(sparkle.life / .42, 0, 1);
+
+      ctx.save();
+      ctx.translate(sparkle.x, sparkle.y);
+      ctx.rotate(sparkle.rotation);
+      ctx.globalAlpha = alpha * .82;
+      ctx.strokeStyle = sparkle.color;
+      ctx.shadowColor = sparkle.color;
+      ctx.shadowBlur = 5;
+      ctx.lineWidth = 1.35;
+      ctx.lineCap = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(-sparkle.size, 0);
+      ctx.lineTo(sparkle.size, 0);
+      ctx.moveTo(0, -sparkle.size);
+      ctx.lineTo(0, sparkle.size);
+      ctx.stroke();
+
+      ctx.globalAlpha = alpha * .28;
+      ctx.beginPath();
+      ctx.moveTo(-sparkle.size * .48, -sparkle.size * .48);
+      ctx.lineTo(sparkle.size * .48, sparkle.size * .48);
+      ctx.moveTo(sparkle.size * .48, -sparkle.size * .48);
+      ctx.lineTo(-sparkle.size * .48, sparkle.size * .48);
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+
+      ctx.restore();
+    });
+
+    ctx.globalAlpha = 1;
+  }
+
+  function drawTransitionHearts() {
+    transitionHearts.forEach(heart => {
+      const sprite = transitionHeartSprites[heart.spriteIndex];
+      if (!sprite) return;
+
+      const displaySize = heart.size * heart.scale * 2.4;
+
+      ctx.save();
+      ctx.translate(heart.x, heart.y);
+      ctx.rotate(heart.rotation);
+      ctx.globalAlpha = heart.alpha * clamp(heart.life / .38, 0, 1);
+      ctx.drawImage(
+        sprite,
+        -displaySize / 2,
+        -displaySize / 2,
+        displaySize,
+        displaySize
+      );
+      ctx.restore();
+    });
+
+    ctx.globalAlpha = 1;
+  }
+
+
+  function spawnBackgroundHeart() {
+    backgroundHearts.push({
+      x: Math.random() * W,
+      y: -35 - Math.random() * 100,
+      speed: 20 + Math.random() * 32,
+      drift: 4 + Math.random() * 12,
+      size: 5 + Math.random() * 10,
+      alpha: .15 + Math.random() * .32,
+      rotation: Math.random() * Math.PI * 2,
+      spin: (Math.random() - .5) * .7,
+      phase: Math.random() * Math.PI * 2,
+      tone: Math.random()
+    });
+  }
+
+  function drawBackgroundHearts(day) {
+    backgroundHearts.forEach(heart => {
+      const nightA = heart.tone > .5 ? "#ff79b5" : "#c77aa7";
+      const dayA = heart.tone > .5 ? "#c9697e" : "#cfa36f";
+
+      ctx.save();
+      ctx.translate(heart.x, heart.y);
+      ctx.rotate(heart.rotation);
+      ctx.globalAlpha = heart.alpha * lerp(.78, 1, day);
+      ctx.fillStyle = mixColor(nightA, dayA, day);
+      drawHeartShape(ctx, 0, 0, heart.size);
+      ctx.restore();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function drawHeartParticle(p, day) {
+    const sprite = transitionHeartSprites[p.spriteIndex];
+    if (!sprite) return;
+
+    const displaySize = p.size * 2.4;
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.globalAlpha = Math.min(1, p.life);
+    ctx.drawImage(
+      sprite,
+      -displaySize / 2,
+      -displaySize / 2,
+      displaySize,
+      displaySize
+    );
+    ctx.restore();
+  }
+
+  function drawHeartShape(context, x, y, size) {
+    context.beginPath();
+    context.moveTo(x, y + size * .3);
+    context.bezierCurveTo(
+      x - size * 1.1, y - size * .35,
+      x - size * .65, y - size,
+      x, y - size * .45
+    );
+    context.bezierCurveTo(
+      x + size * .65, y - size,
+      x + size * 1.1, y - size * .35,
+      x, y + size * .3
+    );
+    context.fill();
+  }
+
+  function fadeWindow(t, fadeInStart, fullStart, fullEnd, fadeOutEnd) {
+    if (t <= fadeInStart || t >= fadeOutEnd) return 0;
+    if (t < fullStart) return smoothstep((t - fadeInStart) / (fullStart - fadeInStart));
+    if (t <= fullEnd) return 1;
+    return 1 - smoothstep((t - fullEnd) / (fadeOutEnd - fullEnd));
+  }
+
+  function smoothstep(value) {
+    const t = clamp(value, 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  function smootherstep(value) {
+    const t = clamp(value, 0, 1);
+    return t * t * t * (t * (t * 6 - 15) + 10);
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function hexToRgb(hex) {
+    const cleaned = hex.replace("#", "");
+    const value = Number.parseInt(cleaned, 16);
+    return {
+      r: (value >> 16) & 255,
+      g: (value >> 8) & 255,
+      b: value & 255
+    };
+  }
+
+  function mixColor(a, b, amount) {
+    const start = hexToRgb(a);
+    const end = hexToRgb(b);
+    const t = clamp(amount, 0, 1);
+    const r = Math.round(lerp(start.r, end.r, t));
+    const g = Math.round(lerp(start.g, end.g, t));
+    const blue = Math.round(lerp(start.b, end.b, t));
+    return `rgb(${r}, ${g}, ${blue})`;
+  }
+
+  function setUiPalette(day) {
+    const root = document.documentElement.style;
+    const lightPanelAlpha = lerp(.78, .74, day);
+
+    root.setProperty(
+      "--panel",
+      day < .5
+        ? `rgba(19, 9, 27, ${lightPanelAlpha})`
+        : `rgba(255, 247, 250, ${lightPanelAlpha})`
+    );
+    root.setProperty("--hud-text", mixColor("#ffe8f4", "#68364f", day));
+    root.setProperty(
+      "--key-bg",
+      day < .5
+        ? "rgba(93, 25, 69, .82)"
+        : `rgba(247, 183, 207, ${lerp(.86, .96, day)})`
+    );
+    root.setProperty("--key-text", mixColor("#ffd9eb", "#7e3457", day));
+    root.setProperty(
+      "--key-active",
+      day < .5
+        ? "rgba(219, 69, 139, .70)"
+        : "rgba(213, 112, 149, .76)"
+    );
+    root.setProperty("--progress-a", mixColor("#ff6cae", "#f283a0", day));
+    root.setProperty("--progress-b", mixColor("#ffd2e7", "#ffe0ae", day));
+    root.setProperty(
+      "--track-bg",
+      day < .5 ? "rgba(255,255,255,.12)" : "rgba(240,218,225,.40)"
+    );
+    root.setProperty(
+      "--track-border",
+      day < .5 ? "rgba(255,255,255,.13)" : "rgba(126,65,94,.18)"
+    );
+    root.setProperty(
+      "--ending-overlay",
+      day < .5 ? "rgba(39,8,30,.34)" : "rgba(255,224,237,.28)"
+    );
+    root.setProperty(
+      "--ending-card-bg",
+      day < .5 ? "rgba(20, 8, 28, .88)" : "rgba(255, 248, 244, .92)"
+    );
+    root.setProperty(
+      "--ending-glow",
+      day < .5 ? "rgba(255, 101, 174, .24)" : "rgba(255, 176, 137, .34)"
+    );
+    root.setProperty("--ending-title", mixColor("#fff5fb", "#63344c", day));
+    root.setProperty("--ending-copy", mixColor("#ead2df", "#7a4a5c", day));
+  }
+
+  function roundRect(context, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    context.beginPath();
+    context.moveTo(x + r, y);
+    context.arcTo(x + width, y, x + width, y + height, r);
+    context.arcTo(x + width, y + height, x, y + height, r);
+    context.arcTo(x, y + height, x, y, r);
+    context.arcTo(x, y, x + width, y, r);
+    context.closePath();
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function loop(now) {
+    if (document.hidden) {
+      lastTime = now;
+      requestAnimationFrame(loop);
+      return;
+    }
+
+    const dt = Math.min(.033, (now - lastTime) / 1000 || 0);
+    lastTime = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  gameInitialized = true;
+  resize();
+  resetGame();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
