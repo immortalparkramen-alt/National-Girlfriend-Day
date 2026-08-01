@@ -931,7 +931,7 @@
     canvas.style.height = H + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Rebuild cached heart sprites only after the game has initialized.
+
     if (gameInitialized) {
       buildTransitionHeartSprites();
       rebuildFlowerLayouts();
@@ -944,7 +944,7 @@
   const platformSpacing = 205;
   const waterYRatio = 0.72;
 
-  // Fixed 142-step sequence for the complete 143-platform journey.
+
   const keySequence =
     "WSSWSSDWAWAWDSADDWADASASSWAAWSSADWDDAADDAWWASSWSDWDAAWWDADWSAASDWWAWAWSASDAADSSWDWADAASASAWDSDSDAWSWSASWDSSWDDWAAWAAWWADADDAASADDWWDSWAWWASDAS";
 
@@ -1030,8 +1030,8 @@
     front: []
   };
 
-  // The uploaded MP3 provides the background music.
-  // Web Audio is still used for the short jump sound effect.
+
+
   let audioContext = null;
   let effectsGain = null;
   let audioEnabled = true;
@@ -1128,7 +1128,7 @@
     finaleMusicSyncStarted = true;
     finaleMusicSegmentStarted = true;
 
-    // From this point forward, play only the final 17 seconds.
+
     musicFadeToken += 1;
     backgroundMusic.pause();
     backgroundMusic.loop = false;
@@ -1158,7 +1158,7 @@
         playAttempt.catch(() => {});
       }
 
-      // A soft entrance prevents the seek from sounding abrupt.
+
       fadeMusicTo(normalMusicVolume * .92, .42);
     };
 
@@ -1177,7 +1177,7 @@
   }
 
   function finishFinaleMusicAtCard() {
-    // Nothing is allowed to play after the ending card appears.
+
     musicFadeToken += 1;
     backgroundMusic.volume = 0;
     backgroundMusic.pause();
@@ -1210,8 +1210,8 @@
   function platformY(index) {
     const waterY = H * waterYRatio;
 
-    // Crumbling stones hover just above the surface, with restrained
-    // height variation so they remain readable as one continuous path.
+
+
     return waterY - 50 + platforms[index].baseYOffset * .34;
   }
 
@@ -1311,12 +1311,12 @@
   }
 
   function startGame() {
-    // Reset before playback so no intro setup can interrupt the song.
+
     resetGame();
     startScreen.classList.add("hidden");
     ensureAudio();
 
-    // Keep this play() call directly inside the Begin button gesture.
+
     backgroundMusic.pause();
     backgroundMusic.loop = true;
     backgroundMusic.currentTime = 0;
@@ -1488,9 +1488,9 @@
       ? backgroundMusic.currentTime
       : 0;
 
-    // The transition begins at 1:24. If the full note would
-    // overlap it, wait. After sunrise reaches its destination, also
-    // wait for the remaining bloom to settle completely.
+
+
+
     if (!daylightLocked) {
       const transitionStart = 84;
       const safetyMargin = .55;
@@ -1705,8 +1705,8 @@
       }
     }
 
-    // The scene begins changing at 1:24 and reaches full daylight at 1:29.
-    // Once daylight arrives, it remains even if the song later loops.
+
+
     const musicTime = Number.isFinite(backgroundMusic.currentTime)
       ? backgroundMusic.currentTime
       : 0;
@@ -1715,7 +1715,7 @@
       const targetDaylight = clamp((musicTime - 84) / 5, 0, 1);
       dayProgress = lerp(dayProgress, targetDaylight, Math.min(1, dt * 2.4));
 
-      // Begin the bloom as soon as the sun starts becoming visible.
+
       if (dayProgress >= .075 && !sunriseFlashTriggered) {
         sunriseFlashTriggered = true;
         sunriseFlash = 0;
@@ -1735,8 +1735,8 @@
     } else {
       dayProgress = 1;
 
-      // Once the sun reaches its final position, let the bloom linger,
-      // then fade over a little more than two seconds.
+
+
       if (sunriseFlash > 0) {
         sunriseFlash = Math.max(0, sunriseFlash - dt * .44);
       }
@@ -1790,8 +1790,8 @@
         }
       }
 
-      // Original text and title pacing, shifted so the title begins
-      // appearing at exactly nine seconds.
+
+
       if (stateTime > 13.35) {
         state = "revealHer";
         stateTime = 0;
@@ -1876,7 +1876,7 @@
       const finalPlatformX = platforms[platforms.length - 1].x;
       cameraTarget = Math.max(0, finalPlatformX - W * 0.50);
 
-      // Keep the pair balanced around the 150px-wide final platform.
+
       const meetX = finalPlatformX;
       player.x = lerp(player.x, meetX - 29, Math.min(1, dt * 2.2));
       partner.x = lerp(partner.x, meetX + 21, Math.min(1, dt * 2.2));
@@ -1905,7 +1905,7 @@
       const finalPlatformX = platforms[platforms.length - 1].x;
       cameraTarget = Math.max(0, finalPlatformX - W * 0.50);
 
-      // A shorter, lighter celebration that keeps the same staged rhythm.
+
       let heartsPerSecond = 0;
       let burstInterval = 999;
 
@@ -2343,7 +2343,7 @@
       ctx.translate(centerX, centerY);
       ctx.scale(pulse, pulse);
 
-      // Soft layered glow behind the entire title composition.
+
       const glow = ctx.createRadialGradient(
         0,
         0,
@@ -2375,7 +2375,7 @@
       );
       ctx.fill();
 
-      // Fit the script title cleanly within the screen.
+
       let titleSize = Math.min(88, Math.max(50, W * .105));
       ctx.font = `400 ${titleSize}px "Love Light", cursive`;
       const maxTitleWidth = Math.min(W - 56, 720);
@@ -2397,7 +2397,7 @@
           maxTitleWidth * .66
         );
 
-      // Fine ornamental rules above and below.
+
       ctx.globalAlpha = titleAlpha * .70;
       ctx.strokeStyle = "rgba(255, 180, 214, .72)";
       ctx.lineWidth = 1.05;
@@ -2436,7 +2436,7 @@
         ctx.stroke();
       });
 
-      // Small decorative hearts at both sides.
+
       ctx.shadowBlur = 12;
       ctx.fillStyle = "rgba(255, 153, 201, .92)";
       ctx.font =
@@ -2454,7 +2454,7 @@
         -titleSize * .03 - ornamentFloat
       );
 
-      // Sparkles and tiny hearts build a richer frame without clutter.
+
       const accents = [
         [-ornamentWidth * .72, -titleSize * .95, "✦", .84],
         [ornamentWidth * .74, -titleSize * .90, "✦", .72],
@@ -2482,7 +2482,7 @@
         );
       });
 
-      // Main title: smaller, better balanced, and more readable.
+
       ctx.globalAlpha = titleAlpha;
       ctx.fillStyle = "#fff8fc";
       ctx.shadowColor = "rgba(255, 91, 169, .48)";
@@ -2491,7 +2491,7 @@
         `400 ${titleSize}px "Love Light", cursive`;
       ctx.fillText(CONFIG.title, 0, 0);
 
-      // Subtle warm inner highlight.
+
       ctx.globalAlpha = titleAlpha * .32;
       ctx.fillStyle = "#ffd8ea";
       ctx.shadowBlur = 0;
@@ -2583,7 +2583,7 @@
     const night = 1 - day;
     const time = performance.now() * .00008;
 
-    // Soft aurora ribbons at night.
+
     if (night > .02) {
       ctx.save();
       ctx.globalCompositeOperation = "screen";
@@ -2619,9 +2619,9 @@
 
       ctx.restore();
 
-      // Three quiet constellations make the upper sky feel intentional.
+
       const constellations = [
-        // Simple heart constellation on the left.
+
         [
           [.112, .158],
           [.132, .126],
@@ -2635,9 +2635,9 @@
           [.125, .204],
           [.112, .158]
         ],
-        // Small upper-middle constellation, comfortably left of the moon.
+
         [[.48, .105], [.515, .145], [.555, .115], [.595, .158], [.635, .128]],
-        // Lower-center constellation, separated from the heart.
+
         [[.34, .325], [.375, .285], [.415, .322], [.455, .282], [.485, .315]]
       ];
 
@@ -2685,7 +2685,7 @@
       ctx.restore();
     }
 
-    // Daytime sunbeams and long, thin cloud streaks.
+
     if (day > .02) {
       ctx.save();
       ctx.globalAlpha = smoothstep((day - .18) / .82) * .16;
@@ -2821,7 +2821,7 @@
     ctx.save();
     ctx.globalAlpha = visibility * .72;
 
-    // A few extra tiny birds at different depths.
+
     const extraBirds = [
       { x: .13, y: .22, scale: .30, phase: .2 },
       { x: .39, y: .18, scale: .24, phase: 2.3 },
@@ -2857,7 +2857,7 @@
       ctx.restore();
     });
 
-    // Extra butterflies closer to the hills.
+
     for (let i = 0; i < 5; i++) {
       const x =
         ((time * (9 + i * 1.2) + i * 211 + 90) %
@@ -2905,7 +2905,7 @@
       ctx.restore();
     }
 
-    // Two tiny kites, drifting gently rather than crossing quickly.
+
     const kites = [
       {
         x: .21,
@@ -2990,7 +2990,7 @@
       ctx.restore();
     });
 
-    // Three small pastel balloons with trailing strings.
+
     const balloons = [
       { x: .10, y: .39, phase: .8, color: "#e68bac", scale: .82 },
       { x: .53, y: .23, phase: 3.1, color: "#d5a1d9", scale: .72 },
@@ -3082,12 +3082,12 @@
       ctx.lineWidth = 2.1;
       ctx.lineCap = "round";
 
-      // Tiny body.
+
       ctx.beginPath();
       ctx.ellipse(0, 1, 4, 1.7, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Curved wings, separated by the body.
+
       ctx.beginPath();
       ctx.moveTo(-1.5, 0);
       ctx.quadraticCurveTo(-10, -9 - flap, -20, -2 + flap * .2);
@@ -3220,14 +3220,14 @@
       ctx.translate(W * cloud.x + sway, H * cloud.y + bob);
       ctx.scale(cloud.scale * cloud.stretch, cloud.scale);
 
-      // Diffused shadow under the cloud.
+
       ctx.globalAlpha = day * .17;
       ctx.fillStyle = mixColor("#b97ea5", "#d798aa", day);
       ctx.beginPath();
       ctx.ellipse(2, 25, 66, 16, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Blush underside gives the clouds depth and keeps them in palette.
+
       const underside = ctx.createLinearGradient(0, -4, 0, 31);
       underside.addColorStop(
         0,
@@ -3251,7 +3251,7 @@
       roundRect(ctx, -68, 5, 136, 29, 14);
       ctx.fill();
 
-      // Cream-white upper puffs.
+
       const topLight = ctx.createLinearGradient(0, -42, 0, 20);
       topLight.addColorStop(
         0,
@@ -3279,7 +3279,7 @@
         ctx.fill();
       });
 
-      // Soft highlight along the cloud's top edge.
+
       ctx.globalAlpha = day * .36;
       ctx.strokeStyle = "#fffdf9";
       ctx.lineWidth = 2.1;
@@ -3290,7 +3290,7 @@
       ctx.quadraticCurveTo(29, -29, 44, -9);
       ctx.stroke();
 
-      // A few subtle hanging wisps on the larger left clouds.
+
       if (cloudIndex < 2) {
         ctx.globalAlpha = day * .19;
         ctx.strokeStyle = mixColor("#f3cadc", "#f2d4d0", day);
@@ -3312,7 +3312,7 @@
         });
       }
 
-      // Tiny pearly glints keep the clouds whimsical without clutter.
+
       if (cloudIndex !== 3) {
         ctx.globalAlpha = day * .34;
         ctx.fillStyle = cloudIndex % 2 === 0 ? "#ffe0ee" : "#fff0d7";
@@ -3370,8 +3370,8 @@
 
     drawWater(waterY, day);
 
-    // Only render platforms near the camera. Drawing all 100 detailed
-    // stones every frame was the largest source of slowdown.
+
+
     const platformPadding = 300;
     const firstVisiblePlatform = clamp(
       Math.floor(
@@ -3435,7 +3435,7 @@
     const time = performance.now() * .001;
     const night = 1 - day;
 
-    // Far mist band.
+
     const mist = ctx.createLinearGradient(
       0,
       waterY - 175,
@@ -3453,7 +3453,7 @@
     ctx.fillStyle = mist;
     ctx.fillRect(0, waterY - 185, W, 195);
 
-    // Back hills.
+
     const backHillGradient = ctx.createLinearGradient(
       0,
       waterY - 170,
@@ -3501,10 +3501,10 @@
     ctx.closePath();
     ctx.fill();
 
-    // Smaller flowers scattered over the distant hills.
+
     drawHillFlowerFields(waterY, day, time, "back");
 
-    // Midground rolling hills.
+
     const midHillGradient = ctx.createLinearGradient(
       0,
       waterY - 125,
@@ -3556,7 +3556,7 @@
     ctx.closePath();
     ctx.fill();
 
-    // Highlighted hill ridges.
+
     ctx.globalAlpha = lerp(.13, .29, day);
     ctx.strokeStyle = mixColor("#b66f9d", "#f0b4bd", day);
     ctx.lineWidth = 2.1;
@@ -3584,10 +3584,10 @@
 
     drawHillFlowerFields(waterY, day, time, "front");
 
-    // Cute volcano positioned center-left to balance the sun.
+
     drawCuteVolcano(W * .245, waterY - 4, 1.17, day, time);
 
-    // Tiny bushes and flowering shrubs across the lower ridge.
+
     const shrubs = [
       [.05, 13, .72],
       [.12, 10, .54],
@@ -3637,7 +3637,7 @@
       ctx.restore();
     });
 
-    // Small winding path on the right hill.
+
     ctx.save();
     ctx.globalAlpha = lerp(.10, .35, day);
     ctx.strokeStyle = mixColor("#b77f9b", "#efd0ba", day);
@@ -3664,7 +3664,7 @@
     ctx.stroke();
     ctx.restore();
 
-    // Occasional hill fireflies at night.
+
     if (night > .05) {
       ctx.save();
       ctx.globalAlpha = night * .42;
@@ -3845,7 +3845,7 @@
     ctx.save();
     ctx.lineCap = "round";
 
-    // Simple straight stems, all anchored exactly on the hill.
+
     ctx.globalAlpha = visibility * .84;
     ctx.strokeStyle = stemColor;
     ctx.lineWidth = isBack ? .75 : 1.15;
@@ -3856,7 +3856,7 @@
     });
     ctx.stroke();
 
-    // Simple round flower heads grouped by palette.
+
     flowerPalette.forEach((color, paletteIndex) => {
       ctx.globalAlpha = visibility;
       ctx.fillStyle = color;
@@ -3877,7 +3877,7 @@
       ctx.fill();
     });
 
-    // Small centers make them read clearly as flowers.
+
     ctx.globalAlpha = visibility * .88;
     ctx.fillStyle = centerColor;
     ctx.beginPath();
@@ -3909,8 +3909,8 @@
     const daytimeHappy = smoothstep(clamp((day - .58) / .34, 0, 1));
     const nightCalm = 1 - smoothstep(clamp(day / .30, 0, 1));
 
-    // Softer, more natural volcano silhouette with broad rounded shoulders
-    // and a narrower summit.
+
+
     const volcanoGradient = ctx.createLinearGradient(0, -174, 0, 2);
     volcanoGradient.addColorStop(
       0,
@@ -3941,11 +3941,11 @@
     ctx.closePath();
     ctx.fill();
 
-    // No separate underside overlay: the base remains within the
-    // same rose-purple body palette.
 
-    // Decorative rock contours stay on the outer slopes and never cross
-    // the face area.
+
+
+
+
     ctx.save();
     ctx.globalAlpha = lerp(.23, .34, day);
     ctx.strokeStyle = mixColor("#a75e89", "#dfa0ab", day);
@@ -3969,7 +3969,7 @@
     });
     ctx.restore();
 
-    // Small scattered rock facets on the lower slopes.
+
     ctx.save();
     ctx.globalAlpha = lerp(.16, .25, day);
     ctx.fillStyle = mixColor("#b27694", "#e0a7b2", day);
@@ -3985,7 +3985,7 @@
     });
     ctx.restore();
 
-    // Compact crater fitted cleanly inside the summit.
+
     const craterGradient = ctx.createLinearGradient(0, -174, 0, -154);
     craterGradient.addColorStop(
       0,
@@ -4001,7 +4001,7 @@
     ctx.ellipse(1, -164, 25, 6.8, -.02, 0, Math.PI * 2);
     ctx.fill();
 
-    // Front rim follows the summit instead of floating above it.
+
     ctx.globalAlpha = lerp(.48, .64, day);
     ctx.strokeStyle = mixColor("#94527a", "#d78c9c", day);
     ctx.lineWidth = 1.7;
@@ -4017,7 +4017,7 @@
     ctx.stroke();
     ctx.globalAlpha = 1;
 
-    // Seamless steam: each puff disappears fully before recycling.
+
     const steamBaseAlpha = lerp(.18, .50, day);
     const steamColor = mixColor("#b98bb4", "#ffe1d5", day);
     ctx.fillStyle = steamColor;
@@ -4050,7 +4050,7 @@
     }
     ctx.globalAlpha = 1;
 
-    // Face grooves are only slightly darker than the body.
+
     const faceY = -82;
     const faceColor = mixColor("#592c50", "#a9617c", day);
 
@@ -4063,7 +4063,7 @@
     ctx.lineJoin = "round";
 
     if (transitionShock > .12) {
-      // Sunrise: open round eyes and a pronounced O mouth.
+
       const eyeRadius = lerp(3.5, 6.5, transitionShock);
       [-23, 23].forEach(eyeX => {
         ctx.beginPath();
@@ -4084,7 +4084,7 @@
       );
       ctx.stroke();
     } else if (daytimeHappy > .15) {
-      // Day: high happy crescent eyes and a large open grin.
+
       [-24, 24].forEach(eyeX => {
         ctx.beginPath();
         ctx.arc(
@@ -4104,7 +4104,7 @@
       ctx.closePath();
       ctx.stroke();
 
-      // Small carved cheek marks make daytime clearly happier.
+
       ctx.globalAlpha = daytimeHappy * .36;
       ctx.lineWidth = 3;
       [-38, 38].forEach(cheekX => {
@@ -4115,7 +4115,7 @@
       });
       ctx.globalAlpha = .84;
     } else {
-      // Night: drooping sleepy eyelids and a tiny neutral mouth.
+
       [-23, 23].forEach(eyeX => {
         ctx.beginPath();
         ctx.moveTo(eyeX - 8, faceY - 1);
@@ -4137,7 +4137,7 @@
 
     ctx.restore();
 
-    // Tiny flowers at the volcano base during daytime.
+
     if (day > .25) {
       ctx.globalAlpha = day * .72;
       [
@@ -4312,7 +4312,7 @@
       drawFish(baseX, baseY, size, dir, colorA, colorB);
     }
 
-    // Lily pads and flowers at the surface.
+
     for (let i = 0; i < 7; i++) {
       const driftX =
         cameraX +
@@ -4372,7 +4372,7 @@
       ctx.restore();
     }
 
-    // Sea grass and shell details along the river bed.
+
     const plantStart = Math.floor((cameraX - 140) / 250) * 250;
     for (let x = plantStart; x < cameraX + W + 180; x += 250) {
       const baseY = H - 7;
@@ -4415,7 +4415,7 @@
       ctx.restore();
     }
 
-    // Surface glints and heart-shaped ripples.
+
     for (let i = 0; i < 16; i++) {
       const x =
         cameraX +
@@ -4472,7 +4472,7 @@
     const py = y + float;
     const halfW = p.width / 2;
 
-    // Small deterministic variations stop every slab from looking copied.
+
     const leftChip = 7 + ((index * 5) % 8);
     const rightChip = 8 + ((index * 7) % 9);
     const topBump = Math.sin(index * 1.31) * 2.2;
@@ -4481,7 +4481,7 @@
 
     ctx.save();
 
-    // Palette-matched reflection and shadow beneath each stone.
+
     const waterGlow = ctx.createRadialGradient(
       p.x,
       waterSurface + 4,
@@ -4556,7 +4556,7 @@
     ctx.stroke();
     ctx.globalAlpha = 1;
 
-    // Stacked broken ledges behind the main slab create visible depth.
+
     const backLayers = [
       {
         widthScale: 1.08,
@@ -4633,7 +4633,7 @@
       ctx.closePath();
       ctx.fill();
 
-      // Bright separator rim makes the stacked strata readable.
+
       ctx.globalAlpha = layer.alpha * lerp(.46, .62, day);
       ctx.strokeStyle = mixColor("#e98ab4", "#eba3a8", day);
       ctx.lineWidth = 1;
@@ -4645,7 +4645,7 @@
       ctx.lineTo(layerX + layerHalfW - notchB, layerY + 1);
       ctx.stroke();
 
-      // A small crack on each visible layer.
+
       ctx.globalAlpha = layer.alpha * .35;
       ctx.strokeStyle = mixColor("#4f214b", "#6b3d50", day);
       ctx.lineWidth = .9;
@@ -4659,7 +4659,7 @@
       ctx.restore();
     });
 
-    // Crumbling stone body.
+
     const stoneGradient = ctx.createLinearGradient(
       p.x,
       py - 5,
@@ -4703,7 +4703,7 @@
     ctx.closePath();
     ctx.fill();
 
-    // Pale upper edge catches the sky color.
+
     ctx.strokeStyle = day < .5
       ? "rgba(255, 210, 232, .48)"
       : "rgba(255, 238, 229, .66)";
@@ -4717,7 +4717,7 @@
     ctx.lineTo(p.x + halfW - rightChip, py + 3);
     ctx.stroke();
 
-    // Subtle top highlight.
+
     ctx.save();
     ctx.globalAlpha = lerp(.22, .33, day);
     ctx.strokeStyle = "#fff8fb";
@@ -4734,7 +4734,7 @@
     ctx.stroke();
     ctx.restore();
 
-    // Crack network.
+
     ctx.save();
     ctx.globalAlpha = lerp(.34, .42, day);
     ctx.strokeStyle = mixColor("#7f315f", "#98536a", day);
@@ -4760,7 +4760,7 @@
     ctx.stroke();
     ctx.restore();
 
-    // A couple of tiny broken chips hover close to the main slab.
+
     const chipColor = mixColor("#b74682", "#c96e86", day);
     ctx.fillStyle = chipColor;
 
@@ -4790,7 +4790,7 @@
       ctx.restore();
     }
 
-    // Foreground fragments overlap the slab slightly for z-depth.
+
     const frontRockColor = mixColor("#b94a86", "#ca6f87", day);
     [
       { dx: -halfW * .56, dy: stoneDepth + 8, scale: .72, rot: .18 },
@@ -4822,7 +4822,7 @@
       ctx.restore();
     });
 
-    // Hanging heart charm beneath selected stones.
+
     if (
       index > 0 &&
       index < platforms.length - 1 &&
@@ -4891,7 +4891,7 @@
     ctx.globalAlpha = effectFade;
 
     if (success) {
-      // Compact success glow and heart/spark burst.
+
       const glowRadius = 34 + effectEase * 18;
       const glow = ctx.createRadialGradient(
         0,
@@ -4953,7 +4953,7 @@
     }
 
     if (error) {
-      // Compact red warning glow.
+
       const warningFade =
         1 - smootherstep(clamp((effectT - .66) / .34, 0, 1));
       const glowRadius = 33 + effectEase * 15;
@@ -4979,7 +4979,7 @@
       ctx.arc(0, 0, glowRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Two warning rings moving outward.
+
       ctx.strokeStyle = "#ff8e9f";
       ctx.lineWidth = 2;
       ctx.globalAlpha = warningFade * .66;
@@ -4992,7 +4992,7 @@
       ctx.arc(0, 0, 34 + effectEase * 19, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Crosses and tiny split-heart halves scatter outward.
+
       const burstRadius = 18 + effectEase * 28;
       for (let i = 0; i < 8; i++) {
         const angle = Math.PI / 8 + i * Math.PI * 2 / 8;
@@ -5102,7 +5102,7 @@
       Math.sin(performance.now() * .0048) * .075 +
       kissBoost * .12;
 
-    // Twice the previous shared-heart size.
+
     const displaySize = (96 + kissBoost * 16) * pulse;
     const spriteIndex = day > .7 ? 5 : 1;
     const sprite = transitionHeartSprites[spriteIndex];
@@ -5172,8 +5172,8 @@
 
     const feetY = platformYValue - 1 + bob;
 
-    // They do a short synchronized two-step, then lean inward for a
-    // held scrapbook-style kiss pose.
+
+
     const reunionActive =
       state === "reunion" ||
       state === "heartFlood" ||
@@ -5238,7 +5238,7 @@
       kissTilt +
       kissPulse;
 
-    // Treiorika uses the original cutout direction; Kyle remains unchanged.
+
     const photoDirection = 1;
 
     const characterCenterOffset = isHer ? 0 : 8;
@@ -5259,7 +5259,7 @@
 
       ctx.drawImage(photo, x0, y0, drawW, drawH);
 
-      // Tiny scrapbook doodles.
+
       ctx.strokeStyle = mixColor("#cd679e", "#e18a90", day);
       ctx.lineWidth = 1.15;
       ctx.globalAlpha = .76;
