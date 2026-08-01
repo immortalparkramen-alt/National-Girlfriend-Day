@@ -770,20 +770,6 @@
   </style>
 </head>
 <body>
-  <!--
-    PERSONALIZE THIS GAME:
-    1. Edit the CONFIG object near the top of the script.
-    2. This edition contains 143 platforms and a cinematic three-beat intro.
-    3. The title fades in around 0:08–0:09.
-    4. The palette changes from night to day between 1:24 and 1:29.
-    5. Love Light and Love Ya Like A Sister load through Google Fonts.
-    5. Keep background.mp3 beside this HTML file.
-    6. The jump sound effect is generated in-browser.
-    7. Optional voice notes can also be placed beside this HTML file:
-       voice1.mp3, voice2.mp3, voice3.mp3, voice4.mp3, voice5.mp3, voice6.mp3
-    8. Send the entire folder together.
-  -->
-
   <canvas id="game"></canvas>
 
   <div id="startScreen">
@@ -1817,13 +1803,13 @@
       cameraTarget = 0;
 
       if (stateTime > 1.15 && stateTime < 1.15 + dt) {
-        showMessage("On one side of the distance, you, are there.", 2600);
+        showMessage("You're there baby, on one side.", 2600);
       }
 
       if (stateTime > 4.0) {
         state = "panToYou";
         stateTime = 0;
-        showMessage("Between us, a pink sea... and one hundred forty-three steps.", 3500);
+        showMessage("And between us, a massive distance...", 3500);
       }
     }
 
@@ -1833,14 +1819,14 @@
       cameraTarget = lerp(0, farCamera, panProgress);
 
       if (stateTime > 5.15 && stateTime < 5.15 + dt) {
-        showMessage("The camera keeps moving, farther and farther.", 3000);
+        showMessage("As the camera moves, farther and farther.", 3000);
       }
 
       if (stateTime > 9.25) {
         cameraTarget = farCamera;
         state = "lingerOnYou";
         stateTime = 0;
-        showMessage("And at the very end, I, am waiting.", 3300);
+        showMessage("And here at the very end, I, am waiting for you.", 3300);
       }
     }
 
